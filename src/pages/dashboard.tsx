@@ -15,6 +15,7 @@ export default function Dashboard() {
 
   const totalControls = allControlsFlat.length;
   const compliant = allControlsFlat.filter((c) => c.status === 'compliant').length;
+  const partial = allControlsFlat.filter((c) => c.status === 'partial').length;
   const nonCompliant = allControlsFlat.filter((c) => c.status === 'non-compliant').length;
   const manual = allControlsFlat.filter((c) => c.status === 'manual').length;
   const unchecked = allControlsFlat.filter((c) => c.status === 'unchecked').length;
@@ -65,7 +66,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
             <p className="text-2xl font-bold text-white">{totalControls}</p>
             <p className="text-xs text-slate-500 uppercase tracking-wider">Total Controls</p>
@@ -73,6 +74,10 @@ export default function Dashboard() {
           <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
             <p className="text-2xl font-bold text-green-400">{compliant}</p>
             <p className="text-xs text-slate-500 uppercase tracking-wider">Compliant</p>
+          </div>
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+            <p className="text-2xl font-bold text-orange-400">{partial}</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wider">Partial</p>
           </div>
           <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
             <p className="text-2xl font-bold text-red-400">{nonCompliant}</p>
