@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, createElement, type ReactNode } from 'react';
 import allControls from './mcsb-controls.json';
-import type { Control, ControlStatus } from '../types/control';
+import type { Control, ControlStatus, EvidenceLink } from '../types/control';
 
 const typedControls = allControls as Record<string, Control[]>;
 
@@ -8,17 +8,23 @@ const typedControls = allControls as Record<string, Control[]>;
 
 const STORAGE_KEY = 'mcsb-control-statuses';
 const NOTES_KEY = 'mcsb-control-notes';
+const EVIDENCE_KEY = 'mcsb-evidence-links';
 type StatusMap = Record<string, ControlStatus>;
 type NotesMap = Record<string, string>;
+type EvidenceMap = Record<string, EvidenceLink[]>;
 
 interface StatusStore {
   getStatus: (controlId: string) => ControlStatus;
   setStatus: (controlId: string, status: ControlStatus) => void;
   getNote: (controlId: string) => string;
   setNote: (controlId: string, note: string) => void;
+  getEvidence: (controlId: string) => EvidenceLink[];
+  addEvidence: (controlId: string, link: EvidenceLink) => void;
+  removeEvidence: (controlId: string, index: number) => void;
   resetAll: () => void;
   statusMap: StatusMap;
   notesMap: NotesMap;
+  evidenceMap: EvidenceMap;
 }
 
 const StatusContext = createContext<StatusStore | null>(null);
@@ -47,9 +53,22 @@ function saveNotes(map: NotesMap) {
   localStorage.setItem(NOTES_KEY, JSON.stringify(map));
 }
 
+function loadEvidence(): EvidenceMap {
+  try {
+    const raw = localStorage.getItem(EVIDENCE_KEY);
+    if (raw) return JSON.parse(raw) as EvidenceMap;
+  } catch { /* ignore corrupted data */ }
+  return {};
+}
+
+function saveEvidence(map: EvidenceMap) {
+  localStorage.setItem(EVIDENCE_KEY, JSON.stringify(map));
+}
+
 export function StatusProvider({ children }: { children: ReactNode }) {
   const [statusMap, setStatusMap] = useState<StatusMap>(loadFromStorage);
   const [notesMap, setNotesMap] = useState<NotesMap>(loadNotes);
+  const [evidenceMap, setEvidenceMap] = useState<EvidenceMap>(loadEvidence);
 
   const getStatus = useCallback(
     (controlId: string): ControlStatus => statusMap[controlId] ?? 'unchecked',
@@ -82,14 +101,45 @@ export function StatusProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const getEvidence = useCallback(
+    (controlId: string): EvidenceLink[] => evidenceMap[controlId] ?? [],
+    [evidenceMap],
+  );
+
+  const addEvidence = useCallback((controlId: string, link: EvidenceLink) => {
+    setEvidenceMap((prev) => {
+      const existing = prev[controlId] ?? [];
+      const next = { ...prev, [controlId]: [...existing, link] };
+      saveEvidence(next);
+      return next;
+    });
+  }, []);
+
+  const removeEvidence = useCallback((controlId: string, index: number) => {
+    setEvidenceMap((prev) => {
+      const existing = [...(prev[controlId] ?? [])];
+      existing.splice(index, 1);
+      const next = { ...prev };
+      if (existing.length > 0) {
+        next[controlId] = existing;
+      } else {
+        delete next[controlId];
+      }
+      saveEvidence(next);
+      return next;
+    });
+  }, []);
+
   const resetAll = useCallback(() => {
     setStatusMap({});
     setNotesMap({});
+    setEvidenceMap({});
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(NOTES_KEY);
+    localStorage.removeItem(EVIDENCE_KEY);
   }, []);
 
-  return createElement(StatusContext.Provider, { value: { getStatus, setStatus, getNote, setNote, resetAll, statusMap, notesMap } }, children);
+  return createElement(StatusContext.Provider, { value: { getStatus, setStatus, getNote, setNote, getEvidence, addEvidence, removeEvidence, resetAll, statusMap, notesMap, evidenceMap } }, children);
 }
 
 export function useStatusStore(): StatusStore {

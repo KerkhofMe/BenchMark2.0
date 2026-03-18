@@ -1,4 +1,4 @@
-# MCSB v2 Security Dashboard
+# Microsoft Cloud Security Benchmark v2 - Dashboard
 
 ## Project Goal
 A React + TypeScript dashboard that visualizes all Microsoft Cloud Security Benchmark v2 (MCSB v2) 

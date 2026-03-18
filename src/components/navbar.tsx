@@ -10,7 +10,7 @@ export default function Navbar() {
               MS
             </div>
             <span className="text-lg font-semibold tracking-tight">
-              MCSB v2 Security Dashboard
+              Microsoft Cloud Security Benchmark v2 - Dashboard
             </span>
           </Link>
         </div>

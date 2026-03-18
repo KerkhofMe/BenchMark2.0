@@ -1,17 +1,18 @@
-import type { Control } from '../types/control';
+import type { Control, EvidenceLink } from '../types/control';
 
 interface ExportableControl extends Control {
   domainCode?: string;
 }
 
-export function exportControlsCsv(controls: ExportableControl[], filename: string, notesMap: Record<string, string> = {}) {
-  const headers = ['ID', 'Title', 'Description', 'Status', 'Assessment Note', 'Remediation', 'KQL Query', 'Azure Policy Link', 'Data Source', 'Table', 'License', 'Setup Steps'];
+export function exportControlsCsv(controls: ExportableControl[], filename: string, notesMap: Record<string, string> = {}, evidenceMap: Record<string, EvidenceLink[]> = {}) {
+  const headers = ['ID', 'Title', 'Description', 'Status', 'Assessment Note', 'Evidence Links', 'Remediation', 'KQL Query', 'Azure Policy Link', 'Data Source', 'Table', 'License', 'Setup Steps'];
   const rows = controls.map((c) => [
     c.id,
     c.title,
     c.description,
     c.status,
     notesMap[c.id] ?? '',
+    (evidenceMap[c.id] ?? []).map((e) => `${e.label}: ${e.url}`).join(' | '),
     c.remediation,
     c.kqlQuery.replace(/\n/g, ' '),
     c.policyLink,

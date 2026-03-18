@@ -7,7 +7,7 @@ import type { Domain } from '../types/domain';
 const typedDomains: Domain[] = domains;
 
 export default function Dashboard() {
-  const { statusMap, notesMap, resetAll } = useStatusStore();
+  const { statusMap, notesMap, evidenceMap, resetAll } = useStatusStore();
   const allControlsFlat = getAllControlsWithStatus(statusMap);
 
   const scores = typedDomains.map((d) => getComplianceScore(d.code, statusMap));
@@ -21,7 +21,7 @@ export default function Dashboard() {
   const unchecked = allControlsFlat.filter((c) => c.status === 'unchecked').length;
 
   function handleExportAll() {
-    exportControlsCsv(allControlsFlat, 'mcsb-v2-all-controls.csv', notesMap);
+    exportControlsCsv(allControlsFlat, 'mcsb-v2-all-controls.csv', notesMap, evidenceMap);
   }
 
   return (

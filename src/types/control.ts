@@ -1,5 +1,10 @@
 export type ControlStatus = 'compliant' | 'non-compliant' | 'partial' | 'manual' | 'unchecked';
 
+export interface EvidenceLink {
+  url: string;
+  label: string;
+}
+
 export type DataSourceType = 'Azure Resource Graph' | 'Log Analytics' | 'Microsoft Defender XDR';
 
 export interface DataSource {

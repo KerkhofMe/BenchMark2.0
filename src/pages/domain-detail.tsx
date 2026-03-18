@@ -15,7 +15,7 @@ const validCodes = new Set(typedDomains.map((d) => d.code));
 export default function DomainDetail() {
   const { code } = useParams<{ code: string }>();
   const [statusFilter, setStatusFilter] = useState<ControlStatus | 'all'>('all');
-  const { statusMap, notesMap } = useStatusStore();
+  const { statusMap, notesMap, evidenceMap } = useStatusStore();
 
   const domain = code && validCodes.has(code) ? typedDomains.find((d) => d.code === code) : undefined;
   const controls = code && validCodes.has(code) ? getControlsWithStatus(code, statusMap) : [];
@@ -40,7 +40,7 @@ export default function DomainDetail() {
   const manual = controls.filter((c) => c.status === 'manual').length;
 
   function handleExport() {
-    exportControlsCsv(controls, `mcsb-v2-${code}-controls.csv`, notesMap);
+    exportControlsCsv(controls, `mcsb-v2-${code}-controls.csv`, notesMap, evidenceMap);
   }
 
   return (
