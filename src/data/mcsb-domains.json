@@ -1,0 +1,74 @@
+[
+  {
+    "code": "IM",
+    "name": "Identity Management",
+    "description": "Controls covering identity and access management including single sign-on, strong authentication, managed identities, and conditional access.",
+    "complianceScore": 78
+  },
+  {
+    "code": "NS",
+    "name": "Network Security",
+    "description": "Controls covering network security fundamentals including virtual network segmentation, private endpoints, and firewall configuration.",
+    "complianceScore": 65
+  },
+  {
+    "code": "DP",
+    "name": "Data Protection",
+    "description": "Controls covering data protection at rest and in transit, including encryption, key management, and sensitive data discovery.",
+    "complianceScore": 82
+  },
+  {
+    "code": "AM",
+    "name": "Asset Management",
+    "description": "Controls covering asset discovery, inventory management, and ensuring proper security configurations for all cloud resources.",
+    "complianceScore": 71
+  },
+  {
+    "code": "LT",
+    "name": "Logging & Threat Detection",
+    "description": "Controls covering enabling threat detection, audit logging, and integrating SIEM for security monitoring and alerting.",
+    "complianceScore": 58
+  },
+  {
+    "code": "IR",
+    "name": "Incident Response",
+    "description": "Controls covering incident response lifecycle including preparation, detection, containment, and post-incident analysis.",
+    "complianceScore": 45
+  },
+  {
+    "code": "PV",
+    "name": "Posture & Vulnerability Management",
+    "description": "Controls covering vulnerability scanning, security assessments, and continuous security posture improvement.",
+    "complianceScore": 62
+  },
+  {
+    "code": "ES",
+    "name": "Endpoint Security",
+    "description": "Controls covering endpoint detection and response, anti-malware protection, and device compliance management.",
+    "complianceScore": 88
+  },
+  {
+    "code": "BR",
+    "name": "Backup & Recovery",
+    "description": "Controls covering data backup, recovery procedures, and ensuring business continuity through resilient architectures.",
+    "complianceScore": 74
+  },
+  {
+    "code": "DS",
+    "name": "DevOps Security",
+    "description": "Controls covering secure development lifecycle, CI/CD pipeline security, and infrastructure as code security practices.",
+    "complianceScore": 53
+  },
+  {
+    "code": "GS",
+    "name": "Governance & Strategy",
+    "description": "Controls covering security governance, roles and responsibilities, risk management strategy, and security policies.",
+    "complianceScore": 69
+  },
+  {
+    "code": "AI",
+    "name": "AI Security",
+    "description": "Controls covering AI/ML workload security, responsible AI practices, model protection, and AI-specific threat mitigation.",
+    "complianceScore": 37
+  }
+]
