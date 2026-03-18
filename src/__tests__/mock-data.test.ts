@@ -5,7 +5,7 @@ import { getComplianceScore } from '../data/compute-scores';
 import type { Domain } from '../types/domain';
 import type { ControlStatus } from '../types/control';
 
-const validStatuses: ControlStatus[] = ['compliant', 'non-compliant', 'manual', 'unchecked'];
+const validStatuses: ControlStatus[] = ['compliant', 'non-compliant', 'partial', 'manual', 'unchecked'];
 
 describe('Mock data: mcsb-domains.json', () => {
   it('contains exactly 12 domains', () => {
@@ -109,5 +109,33 @@ describe('Computed compliance scores', () => {
     for (const domain of domains as Domain[]) {
       expect(getComplianceScore(domain.code, {})).toBe(0);
     }
+  });
+
+  it('counts partial status as 0.5 in compliance score', () => {
+    const controlMap = allControls as Record<string, { id: string }[]>;
+    // Pick first domain with controls
+    const domainCode = (domains as Domain[])[0].code;
+    const controls = controlMap[domainCode];
+    // Set all controls to partial
+    const statusMap: Record<string, string> = {};
+    for (const c of controls) {
+      statusMap[c.id] = 'partial';
+    }
+    // All partial → score = (0 + count*0.5) / count * 100 = 50
+    expect(getComplianceScore(domainCode, statusMap)).toBe(50);
+  });
+
+  it('combines compliant and partial correctly in score', () => {
+    const controlMap = allControls as Record<string, { id: string }[]>;
+    const domainCode = (domains as Domain[])[0].code;
+    const controls = controlMap[domainCode];
+    const statusMap: Record<string, string> = {};
+    // First control compliant (1.0), second control partial (0.5), rest unchecked (0)
+    statusMap[controls[0].id] = 'compliant';
+    if (controls.length > 1) {
+      statusMap[controls[1].id] = 'partial';
+    }
+    const expected = Math.round(((1 + (controls.length > 1 ? 0.5 : 0)) / controls.length) * 100);
+    expect(getComplianceScore(domainCode, statusMap)).toBe(expected);
   });
 });

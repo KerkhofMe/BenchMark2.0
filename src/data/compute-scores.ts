@@ -104,7 +104,8 @@ export function getComplianceScore(domainCode: string, statusMap: StatusMap): nu
   const controls = typedControls[domainCode];
   if (!controls || controls.length === 0) return 0;
   const compliant = controls.filter((c) => (statusMap[c.id] ?? 'unchecked') === 'compliant').length;
-  return Math.round((compliant / controls.length) * 100);
+  const partial = controls.filter((c) => (statusMap[c.id] ?? 'unchecked') === 'partial').length;
+  return Math.round(((compliant + partial * 0.5) / controls.length) * 100);
 }
 
 export function getAssessedCount(domainCode: string, statusMap: StatusMap): { assessed: number; total: number } {

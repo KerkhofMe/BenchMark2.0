@@ -1,4 +1,4 @@
-export type ControlStatus = 'compliant' | 'non-compliant' | 'manual' | 'unchecked';
+export type ControlStatus = 'compliant' | 'non-compliant' | 'partial' | 'manual' | 'unchecked';
 
 export type DataSourceType = 'Azure Resource Graph' | 'Log Analytics' | 'Microsoft Defender XDR';
 

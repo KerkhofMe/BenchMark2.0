@@ -35,6 +35,7 @@ export default function DomainDetail() {
   }
 
   const compliant = controls.filter((c) => c.status === 'compliant').length;
+  const partial = controls.filter((c) => c.status === 'partial').length;
   const nonCompliant = controls.filter((c) => c.status === 'non-compliant').length;
   const manual = controls.filter((c) => c.status === 'manual').length;
 
@@ -69,6 +70,7 @@ export default function DomainDetail() {
         <p className="text-slate-400 mb-4">{domain.description}</p>
         <div className="flex gap-4 text-sm mb-5">
           <span className="text-green-400">{compliant} compliant</span>
+          <span className="text-orange-400">{partial} partial</span>
           <span className="text-red-400">{nonCompliant} non-compliant</span>
           <span className="text-yellow-400">{manual} manual</span>
           <span className="text-slate-500">&middot;</span>

@@ -4,6 +4,7 @@ import { useStatusStore } from '../data/compute-scores';
 
 const STATUS_OPTIONS: { value: ControlStatus; label: string }[] = [
   { value: 'compliant', label: 'Compliant' },
+  { value: 'partial', label: 'Partial' },
   { value: 'non-compliant', label: 'Non-Compliant' },
   { value: 'manual', label: 'Manual' },
   { value: 'unchecked', label: 'Unchecked' },
@@ -12,6 +13,7 @@ const STATUS_OPTIONS: { value: ControlStatus; label: string }[] = [
 function statusColor(status: ControlStatus): string {
   switch (status) {
     case 'compliant': return 'text-green-400 bg-green-500/20';
+    case 'partial': return 'text-orange-400 bg-orange-500/20';
     case 'non-compliant': return 'text-red-400 bg-red-500/20';
     case 'manual': return 'text-yellow-400 bg-yellow-500/20';
     case 'unchecked': return 'text-slate-400 bg-slate-500/20';
@@ -21,6 +23,7 @@ function statusColor(status: ControlStatus): string {
 function statusLabel(status: ControlStatus): string {
   switch (status) {
     case 'compliant': return 'Compliant';
+    case 'partial': return 'Partial';
     case 'non-compliant': return 'Non-Compliant';
     case 'manual': return 'Manual';
     case 'unchecked': return 'Unchecked';
@@ -54,6 +57,7 @@ export default function ControlCard({ control }: ControlCardProps) {
   const note = getNote(control.id);
   const [localNote, setLocalNote] = useState(note);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const noteRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setLocalNote(note);
@@ -75,6 +79,9 @@ export default function ControlCard({ control }: ControlCardProps) {
   function handleStatusChange(newStatus: ControlStatus) {
     setStatus(control.id, newStatus);
     setShowPicker(false);
+    if (newStatus === 'partial') {
+      setTimeout(() => noteRef.current?.focus(), 0);
+    }
   }
 
   return (
@@ -196,6 +203,7 @@ export default function ControlCard({ control }: ControlCardProps) {
         </label>
         <textarea
           id={`note-${control.id}`}
+          ref={noteRef}
           value={localNote}
           onChange={(e) => handleNoteChange(e.target.value)}
           placeholder="Add a note (e.g., why this control is non-compliant, evidence, ticket link)..."

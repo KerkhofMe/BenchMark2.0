@@ -4,6 +4,7 @@ const statuses: { value: ControlStatus | 'all'; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'unchecked', label: 'Unchecked' },
   { value: 'compliant', label: 'Compliant' },
+  { value: 'partial', label: 'Partial' },
   { value: 'non-compliant', label: 'Non-Compliant' },
   { value: 'manual', label: 'Manual' },
 ];
