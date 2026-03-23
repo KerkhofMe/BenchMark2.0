@@ -5,7 +5,7 @@ export interface EvidenceLink {
   label: string;
 }
 
-export type DataSourceType = 'Azure Resource Graph' | 'Log Analytics' | 'Microsoft Defender XDR';
+export type DataSourceType = 'Microsoft Sentinel Data Lake' | 'Azure Resource Graph' | 'Log Analytics' | 'Microsoft Defender XDR';
 
 export interface DataSource {
   type: DataSourceType;

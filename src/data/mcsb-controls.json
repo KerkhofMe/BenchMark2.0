@@ -9,12 +9,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/0da106f2-4ca3-48e8-bc85-c638fe6aea8f.html",
       "remediation": "Register all applications in Microsoft Entra ID and configure SSO. Run: az ad app list to audit unregistered apps.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "SigninLogs",
-        "license": "Microsoft Entra ID P1/P2",
+        "license": "Microsoft Entra ID P1/P2 + Microsoft Sentinel",
         "setup": [
-          "Entra ID → Diagnostic settings → Send to Log Analytics workspace",
-          "Enable log category: SignInLogs"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Sentinel → Data connectors → Microsoft Entra ID → Connect",
+          "Enable log category: SignInLogs",
+          "Data is ingested into Analytics tier and mirrored to the Data Lake tier for long-term retention",
+          "Configure retention: Defender portal → Settings → Data retention → set up to 12 years"
         ]
       }
     },
@@ -27,12 +30,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/9b828565-a0ed-4f21-bc1b-da5c90ad0023.html",
       "remediation": "Create a Conditional Access policy to block legacy authentication. In Entra ID > Security > Conditional Access, create a policy targeting all users with client apps set to Exchange ActiveSync and Other clients, then set grant to Block access.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "SigninLogs",
-        "license": "Microsoft Entra ID P1/P2",
+        "license": "Microsoft Entra ID P1/P2 + Microsoft Sentinel",
         "setup": [
-          "Entra ID → Diagnostic settings → Send to Log Analytics workspace",
-          "Enable log category: SignInLogs"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Sentinel → Data connectors → Microsoft Entra ID → Connect",
+          "Enable log category: SignInLogs",
+          "Data is ingested into Analytics tier and mirrored to the Data Lake tier for long-term retention",
+          "Configure retention: Defender portal → Settings → Data retention → set up to 12 years"
         ]
       }
     },
@@ -45,12 +51,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/71ef260a-8f18-47b7-abcb-62d0673d94dc.html",
       "remediation": "Migrate service principals using client secrets to managed identities. For each app run: az webapp identity assign --name <app> --resource-group <rg>",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AuditLogs",
-        "license": "Microsoft Entra ID P1/P2",
+        "license": "Microsoft Entra ID P1/P2 + Microsoft Sentinel",
         "setup": [
-          "Entra ID → Diagnostic settings → Send to Log Analytics workspace",
-          "Enable log category: AuditLogs"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Sentinel → Data connectors → Microsoft Entra ID → Connect",
+          "Enable log category: AuditLogs",
+          "Data is ingested into Analytics tier and mirrored to the Data Lake tier for long-term retention",
+          "Configure retention: Defender portal → Settings → Data retention → set up to 12 years"
         ]
       }
     },
@@ -63,12 +72,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/e3e008c3-56b9-4133-8fd7-d3347377402a.html",
       "remediation": "Enable MFA via Conditional Access for all users. In Entra ID > Security > Conditional Access, create policy for all users and all cloud apps with grant set to Require multifactor authentication.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "SigninLogs",
-        "license": "Microsoft Entra ID P1/P2",
+        "license": "Microsoft Entra ID P1/P2 + Microsoft Sentinel",
         "setup": [
-          "Entra ID → Diagnostic settings → Send to Log Analytics workspace",
-          "Enable log category: SignInLogs"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Sentinel → Data connectors → Microsoft Entra ID → Connect",
+          "Enable log category: SignInLogs",
+          "Data is ingested into Analytics tier and mirrored to the Data Lake tier for long-term retention",
+          "Configure retention: Defender portal → Settings → Data retention → set up to 12 years"
         ]
       }
     }
@@ -83,14 +95,16 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/e71308d3-144b-4262-b144-efdc3cc90517.html",
       "remediation": "Review NSG rules and ensure proper subnet segmentation. Use az network nsg rule list to audit. Deny all inbound by default, allow only required ports.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureNetworkAnalytics_CL",
-        "license": "None (included with Network Watcher)",
+        "license": "Network Watcher + Microsoft Sentinel",
         "setup": [
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
           "Enable Network Watcher in each region",
-          "Enable NSG Flow Logs for each NSG",
-          "Enable Traffic Analytics → point to Log Analytics workspace",
-          "Storage account required for raw flow logs"
+          "Enable NSG Flow Logs for each NSG → point to Sentinel workspace",
+          "Enable Traffic Analytics → point to Sentinel workspace",
+          "Data flows into Analytics tier and is mirrored to the Data Lake tier",
+          "Use Data Lake for long-term network forensics up to 12 years"
         ]
       }
     },
@@ -120,12 +134,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/fc5e4038-4584-4632-8c85-c0448d374b2c.html",
       "remediation": "Verify Azure Firewall is deployed and filtering traffic. Review firewall rules with: az network firewall rule list --resource-group <rg> --firewall-name <fw>",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureDiagnostics",
-        "license": "None (included with Azure Firewall)",
+        "license": "Azure Firewall + Microsoft Sentinel",
         "setup": [
-          "Azure Firewall → Diagnostic settings → Send to Log Analytics workspace",
-          "Enable log category: AzureFirewallNetworkRule"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Azure Firewall → Diagnostic settings → Send to Sentinel workspace",
+          "Enable log category: AzureFirewallNetworkRule",
+          "Data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
       }
     },
@@ -138,13 +154,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/564feb30-bf6a-4854-b4bb-0d2d2d1e6c66.html",
       "remediation": "Manually verify Azure Firewall Premium IDPS is enabled. In Portal > Azure Firewall > IDPS tab, confirm signature-based detection is set to Alert and Deny.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureDiagnostics",
-        "license": "Azure Firewall Premium",
+        "license": "Azure Firewall Premium + Microsoft Sentinel",
         "setup": [
-          "Azure Firewall Premium → Diagnostic settings → Send to Log Analytics workspace",
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Azure Firewall Premium → Diagnostic settings → Send to Sentinel workspace",
           "Enable log category: AzureFirewallIDPSSignature",
-          "IDPS must be enabled on the Firewall Policy"
+          "IDPS must be enabled on the Firewall Policy",
+          "Data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
       }
     },
@@ -157,13 +175,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/a7aca53f-2ed4-4466-a25e-0b45ade68efd.html",
       "remediation": "Enable DDoS Protection Standard. Run: az network ddos-protection create --name <plan> --resource-group <rg>, then associate with VNets.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureDiagnostics",
-        "license": "Azure DDoS Protection Standard",
+        "license": "Azure DDoS Protection Standard + Microsoft Sentinel",
         "setup": [
-          "Public IP → Diagnostic settings → Send to Log Analytics workspace",
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Public IP → Diagnostic settings → Send to Sentinel workspace",
           "Enable log category: DDoSProtectionNotifications",
-          "DDoS Protection plan must be associated with the VNet"
+          "DDoS Protection plan must be associated with the VNet",
+          "Data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
       }
     }
@@ -178,13 +198,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/e9c8d085-d9cc-4b17-9cdc-059f1f01f19e.html",
       "remediation": "Configure Microsoft Purview auto-labeling policies. In Purview portal > Information protection > Auto-labeling, create policies for sensitive data types.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "InformationProtectionLogs_CL",
-        "license": "Microsoft 365 E5 or Microsoft Purview Information Protection",
+        "license": "Microsoft 365 E5 or Purview Information Protection + Microsoft Sentinel",
         "setup": [
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
           "Purview compliance portal → Settings → Enable analytics",
-          "Configure Log Analytics workspace export",
-          "This is a custom log table (_CL suffix)"
+          "Configure export to Sentinel workspace",
+          "Custom log table (_CL suffix) — data flows into Analytics tier and is mirrored to the Data Lake tier",
+          "Use Data Lake for long-term data classification audit trail"
         ]
       }
     },
@@ -197,12 +219,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/4da35fc9-c9e7-4960-aec9-797fe7d9051d.html",
       "remediation": "Enable Microsoft Defender for SQL, Storage, and Cosmos DB. Run: az security pricing create --name SqlServers --tier Standard",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "SecurityAlert",
-        "license": "Microsoft Defender for Cloud (Standard tier)",
+        "license": "Microsoft Defender for Cloud (Standard tier) + Microsoft Sentinel",
         "setup": [
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
           "Defender for Cloud → Environment settings → Enable Defender plans for SQL, Storage, Cosmos DB",
-          "Defender for Cloud → Continuous export → Log Analytics workspace"
+          "Defender for Cloud → Continuous export → Sentinel workspace",
+          "Alerts flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
       }
     },
@@ -268,13 +292,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/a08ec900-254a-4555-9bf5-e42af04b5cae.html",
       "remediation": "Assign the built-in policy Allowed resource types to restrict deployments. Run: az policy assignment create with the allowed-types policy definition.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureActivity",
-        "license": "None (included with subscription)",
+        "license": "Microsoft Sentinel",
         "setup": [
-          "Azure Monitor → Activity log → Diagnostic settings",
-          "Send to Log Analytics workspace",
-          "Enable categories: Administrative, Security"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Sentinel → Data connectors → Azure Activity → Connect",
+          "Enable categories: Administrative, Security",
+          "Activity logs flow into Analytics tier and are mirrored to the Data Lake tier",
+          "Use Data Lake for long-term activity audit trail up to 12 years"
         ]
       }
     },
@@ -306,12 +332,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/1f7c564c-0a90-4d44-b7e1-9d456cffaee8.html",
       "remediation": "Enable all Defender for Cloud plans. Run: az security pricing create --name VirtualMachines --tier Standard. Repeat for Servers, AppServices, SqlServers, Storage, KeyVaults.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "SecurityAlert",
-        "license": "Microsoft Defender for Cloud (Standard tier)",
+        "license": "Microsoft Defender for Cloud (Standard tier) + Microsoft Sentinel",
         "setup": [
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
           "Defender for Cloud → Environment settings → Enable Defender plans",
-          "Defender for Cloud → Continuous export → Log Analytics workspace"
+          "Defender for Cloud → Continuous export → Sentinel workspace",
+          "Alerts flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
       }
     },
@@ -324,13 +352,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/2d7e144b-159c-44fc-95c1-ac3dbf5e6e54.html",
       "remediation": "Verify Entra ID Protection is enabled. In Entra ID > Security > Identity Protection, configure user risk and sign-in risk policies.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AADRiskyUsers",
-        "license": "Microsoft Entra ID P2",
+        "license": "Microsoft Entra ID P2 + Microsoft Sentinel",
         "setup": [
-          "Entra ID → Diagnostic settings → Send to Log Analytics workspace",
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Sentinel → Data connectors → Microsoft Entra ID → Connect",
           "Enable log category: RiskyUsers",
-          "Entra ID Protection must be enabled"
+          "Entra ID Protection must be enabled",
+          "Risk data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
       }
     },
@@ -360,13 +390,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/27960feb-a23c-4577-8d36-ef8b5f35e0be.html",
       "remediation": "Enable NSG flow logs manually. In Portal > Network Watcher > NSG Flow Logs, enable for all NSGs with Traffic Analytics.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureNetworkAnalytics_CL",
-        "license": "None (included with Network Watcher)",
+        "license": "Network Watcher + Microsoft Sentinel",
         "setup": [
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
           "Enable Network Watcher in each region",
-          "Enable NSG Flow Logs for each NSG",
-          "Enable Traffic Analytics → point to Log Analytics workspace"
+          "Enable NSG Flow Logs → point to Sentinel workspace",
+          "Enable Traffic Analytics → point to Sentinel workspace",
+          "Network logs flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
       }
     }
@@ -381,12 +413,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/0fc39691-5a3f-4e3e-94ee-2e6447de0046.html",
       "remediation": "Review and update the incident response plan quarterly. Ensure it covers: roles, escalation paths, communication templates, and post-incident review process.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "SecurityIncident",
         "license": "Microsoft Sentinel",
         "setup": [
-          "Enable Microsoft Sentinel on the Log Analytics workspace",
-          "Enable analytics rules to generate incidents from alerts"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Enable analytics rules to generate incidents from alerts",
+          "Incidents are stored in Analytics tier and mirrored to the Data Lake tier",
+          "Use Data Lake for long-term incident history and forensic analysis up to 12 years"
         ]
       }
     },
@@ -416,12 +450,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/f9dce0f0-2f1f-4cba-b6e7-2d1b0f1e8c66.html",
       "remediation": "Review Sentinel analytics rules. Ensure high-fidelity rules are enabled for common attack patterns: brute force, impossible travel, suspicious PowerShell.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "SecurityAlert",
-        "license": "Microsoft Defender for Cloud (Standard tier)",
+        "license": "Microsoft Defender for Cloud (Standard tier) + Microsoft Sentinel",
         "setup": [
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
           "Defender for Cloud → Environment settings → Enable Defender plans",
-          "Defender for Cloud → Continuous export → Log Analytics workspace"
+          "Defender for Cloud → Continuous export → Sentinel workspace",
+          "Alerts flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
       }
     }
@@ -436,13 +472,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/1f3afdf9-d0c9-4c3d-847f-89da613e70a8.html",
       "remediation": "Apply Azure Security Benchmark initiative via Azure Policy. Assign the built-in MCSB policy initiative at the subscription or management group level.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "SecurityRecommendation",
-        "license": "Microsoft Defender for Cloud (Standard tier)",
+        "license": "Microsoft Defender for Cloud (Standard tier) + Microsoft Sentinel",
         "setup": [
-          "Defender for Cloud → Environment settings → Continuous export",
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Defender for Cloud → Environment settings → Continuous export → Sentinel workspace",
           "Export category: Security recommendations",
-          "Select target Log Analytics workspace"
+          "Recommendations flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
       }
     },
@@ -472,13 +509,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/501541f7-f7e7-4cd6-868c-4190fdad3ac9.html",
       "remediation": "Enable vulnerability assessment on VMs and SQL databases. Enable the Qualys or Microsoft Defender vulnerability scanner via Defender for Cloud.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "SecurityRecommendation",
-        "license": "Microsoft Defender for Cloud (Standard tier)",
+        "license": "Microsoft Defender for Cloud (Standard tier) + Microsoft Sentinel",
         "setup": [
-          "Defender for Cloud → Environment settings → Continuous export",
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Defender for Cloud → Environment settings → Continuous export → Sentinel workspace",
           "Export category: Security recommendations",
-          "Select target Log Analytics workspace"
+          "Recommendations flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
       }
     },
@@ -491,13 +529,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/3c735d8a-a4ba-4a3a-b7cf-db7754cf57f4.html",
       "remediation": "Define SLA targets: Critical = 7 days, High = 30 days, Medium = 90 days. Track remediation age using the KQL query and escalate overdue items.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "SecurityRecommendation",
-        "license": "Microsoft Defender for Cloud (Standard tier)",
+        "license": "Microsoft Defender for Cloud (Standard tier) + Microsoft Sentinel",
         "setup": [
-          "Defender for Cloud → Environment settings → Continuous export",
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Defender for Cloud → Environment settings → Continuous export → Sentinel workspace",
           "Export category: Security recommendations",
-          "Select target Log Analytics workspace"
+          "Use Data Lake for long-term vulnerability trend analysis up to 12 years"
         ]
       }
     }
@@ -512,13 +551,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/2465583e-4e78-4c15-b6be-a36cbc7c8b0f.html",
       "remediation": "Verify all endpoints are onboarded to Defender for Endpoint. Use the KQL query to check onboarding status by OS platform.",
       "dataSource": {
-        "type": "Microsoft Defender XDR",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "DeviceInfo",
-        "license": "Microsoft Defender for Endpoint P2 (or M365 E5)",
+        "license": "Microsoft Defender for Endpoint P2 (or M365 E5) + Microsoft Sentinel",
         "setup": [
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Sentinel → Data connectors → Microsoft Defender XDR → Connect",
           "Onboard devices via Intune, GPO, or manual script",
-          "Query runs in security.microsoft.com → Advanced Hunting",
-          "To query in Log Analytics: connect Sentinel → M365 Defender data connector"
+          "MDE data flows into Analytics tier and is mirrored to the Data Lake tier",
+          "Query via Sentinel Data Lake KQL editor or Advanced Hunting"
         ]
       }
     },
@@ -531,13 +572,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/2d7e144b-159c-44fc-95c1-ac3dbf5e6e54.html",
       "remediation": "Confirm Defender Antivirus real-time protection is enabled. Check via Intune compliance policies or PowerShell: Get-MpPreference.",
       "dataSource": {
-        "type": "Microsoft Defender XDR",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "DeviceTvmSecureConfigurationAssessment",
-        "license": "Microsoft Defender for Endpoint P2 (or M365 E5)",
+        "license": "Microsoft Defender for Endpoint P2 (or M365 E5) + Microsoft Sentinel",
         "setup": [
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Sentinel → Data connectors → Microsoft Defender XDR → Connect",
           "Onboard devices via Intune, GPO, or manual script",
-          "Threat & Vulnerability Management is included with MDE P2",
-          "Query runs in security.microsoft.com → Advanced Hunting"
+          "TVM data flows into Analytics tier and is mirrored to the Data Lake tier",
+          "Query via Sentinel Data Lake KQL editor or Advanced Hunting"
         ]
       }
     },
@@ -550,13 +593,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/9b597639-28f4-48eb-b4c0-06644a248ea3.html",
       "remediation": "Verify signature auto-update is configured. Devices with signatures older than 3 days should be investigated. Check Intune update rings.",
       "dataSource": {
-        "type": "Microsoft Defender XDR",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "DeviceTvmSecureConfigurationAssessment",
-        "license": "Microsoft Defender for Endpoint P2 (or M365 E5)",
+        "license": "Microsoft Defender for Endpoint P2 (or M365 E5) + Microsoft Sentinel",
         "setup": [
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Sentinel → Data connectors → Microsoft Defender XDR → Connect",
           "Onboard devices via Intune, GPO, or manual script",
-          "Threat & Vulnerability Management is included with MDE P2",
-          "Query runs in security.microsoft.com → Advanced Hunting"
+          "TVM data flows into Analytics tier and is mirrored to the Data Lake tier",
+          "Query via Sentinel Data Lake KQL editor or Advanced Hunting"
         ]
       }
     }
@@ -571,12 +616,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/013e242c-8828-4970-87b3-ab247555486d.html",
       "remediation": "Verify backup policies are assigned to all critical VMs. Run: az backup policy list --vault-name <vault> --resource-group <rg>",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureDiagnostics",
-        "license": "None (included with Recovery Services vault)",
+        "license": "Recovery Services vault + Microsoft Sentinel",
         "setup": [
-          "Recovery Services vault → Diagnostic settings → Send to Log Analytics workspace",
-          "Enable log category: AzureBackupReport"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Recovery Services vault → Diagnostic settings → Send to Sentinel workspace",
+          "Enable log category: AzureBackupReport",
+          "Backup data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
       }
     },
@@ -606,12 +653,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/013e242c-8828-4970-87b3-ab247555486d.html",
       "remediation": "Configure Azure Monitor alerts for backup failures. In Portal > Recovery Services vault > Alerts, create action rules for failed backup jobs.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureDiagnostics",
-        "license": "None (included with Recovery Services vault)",
+        "license": "Recovery Services vault + Microsoft Sentinel",
         "setup": [
-          "Recovery Services vault → Diagnostic settings → Send to Log Analytics workspace",
-          "Enable log category: AzureBackupReport"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Recovery Services vault → Diagnostic settings → Send to Sentinel workspace",
+          "Enable log category: AzureBackupReport",
+          "Backup data flows into Analytics tier and is mirrored to the Data Lake tier",
+          "Use Data Lake for long-term backup compliance history"
         ]
       }
     }
@@ -626,13 +676,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/c3f317a7-a95c-4547-b7e7-11017ebdf2fe.html",
       "remediation": "Adopt Microsoft Threat Modeling Tool or STRIDE methodology. Document threat models for each service in your architecture and review during sprint planning.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureDevOpsAuditing",
         "license": "Microsoft Sentinel + Azure DevOps",
         "setup": [
-          "Enable Microsoft Sentinel on Log Analytics workspace",
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
           "Sentinel → Data connectors → Azure DevOps → Connect",
-          "Requires Azure DevOps Organization admin permissions"
+          "Requires Azure DevOps Organization admin permissions",
+          "DevOps audit logs flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
       }
     },
@@ -645,13 +696,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/c3f317a7-a95c-4547-b7e7-11017ebdf2fe.html",
       "remediation": "Enable GitHub Advanced Security or Azure DevOps Advanced Security for dependency scanning. Configure Dependabot or equivalent for automatic dependency updates.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureDevOpsAuditing",
         "license": "Microsoft Sentinel + Azure DevOps",
         "setup": [
-          "Enable Microsoft Sentinel on Log Analytics workspace",
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
           "Sentinel → Data connectors → Azure DevOps → Connect",
-          "Requires Azure DevOps Organization admin permissions"
+          "Requires Azure DevOps Organization admin permissions",
+          "DevOps audit logs flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
       }
     },
@@ -664,13 +716,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/c3f317a7-a95c-4547-b7e7-11017ebdf2fe.html",
       "remediation": "Migrate pipeline secrets to Azure Key Vault. Use the Key Vault task in pipelines. Never store secrets in variable groups directly.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureDevOpsAuditing",
         "license": "Microsoft Sentinel + Azure DevOps",
         "setup": [
-          "Enable Microsoft Sentinel on Log Analytics workspace",
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
           "Sentinel → Data connectors → Azure DevOps → Connect",
-          "Requires Azure DevOps Organization admin permissions"
+          "Requires Azure DevOps Organization admin permissions",
+          "DevOps audit logs flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
       }
     }
@@ -685,12 +738,15 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/4f11b553-d42e-4e3a-89be-32ca364cad4c.html",
       "remediation": "Assign security owners per subscription using Azure RBAC. Document the RACI matrix for security responsibilities.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AuditLogs",
-        "license": "Microsoft Entra ID P1/P2",
+        "license": "Microsoft Entra ID P1/P2 + Microsoft Sentinel",
         "setup": [
-          "Entra ID → Diagnostic settings → Send to Log Analytics workspace",
-          "Enable log category: AuditLogs"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Sentinel → Data connectors → Microsoft Entra ID → Connect",
+          "Enable log category: AuditLogs",
+          "Audit data flows into Analytics tier and is mirrored to the Data Lake tier",
+          "Configure retention: Defender portal → Settings → Data retention → set up to 12 years"
         ]
       }
     },
@@ -720,12 +776,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/e9c8d085-d9cc-4b17-9cdc-059f1f01f19e.html",
       "remediation": "Define data classification levels and map to Microsoft Purview sensitivity labels. Create auto-labeling policies for Public, Internal, Confidential, and Restricted data.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "InformationProtectionLogs_CL",
-        "license": "Microsoft 365 E5 or Microsoft Purview Information Protection",
+        "license": "Microsoft 365 E5 or Purview Information Protection + Microsoft Sentinel",
         "setup": [
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
           "Purview compliance portal → Settings → Enable analytics",
-          "Configure Log Analytics workspace export"
+          "Configure export to Sentinel workspace",
+          "Custom log table (_CL suffix) — data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
       }
     }
@@ -757,12 +815,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/0725b4dd-7e76-479c-a735-68e7ee23d5de.html",
       "remediation": "Enable network isolation for Cognitive Services. Configure private endpoints and disable public network access for all AI service instances.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureDiagnostics",
-        "license": "None (included with Cognitive Services)",
+        "license": "Cognitive Services + Microsoft Sentinel",
         "setup": [
-          "Cognitive Services resource → Diagnostic settings → Send to Log Analytics workspace",
-          "Enable all log categories (RequestResponse)"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Cognitive Services resource → Diagnostic settings → Send to Sentinel workspace",
+          "Enable all log categories (RequestResponse)",
+          "AI telemetry flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
       }
     },
@@ -775,12 +835,14 @@
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/0725b4dd-7e76-479c-a735-68e7ee23d5de.html",
       "remediation": "Enable content filters in Azure OpenAI Studio. Configure severity thresholds for hate, sexual, violence, and self-harm categories. Monitor filtered requests.",
       "dataSource": {
-        "type": "Log Analytics",
+        "type": "Microsoft Sentinel Data Lake",
         "table": "AzureDiagnostics",
-        "license": "None (included with Cognitive Services)",
+        "license": "Cognitive Services + Microsoft Sentinel",
         "setup": [
-          "Cognitive Services resource → Diagnostic settings → Send to Log Analytics workspace",
-          "Enable all log categories (RequestResponse)"
+          "Enable Microsoft Sentinel on a Log Analytics workspace",
+          "Cognitive Services resource → Diagnostic settings → Send to Sentinel workspace",
+          "Enable all log categories (RequestResponse)",
+          "AI telemetry flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
       }
     }

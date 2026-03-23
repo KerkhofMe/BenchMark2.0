@@ -59,7 +59,7 @@ describe('Mock data: mcsb-controls.json', () => {
         expect(control.policyLink).toMatch(/^https:\/\//);
         expect(control.remediation).toBeTruthy();
         expect(control.dataSource).toBeDefined();
-        expect(['Azure Resource Graph', 'Log Analytics', 'Microsoft Defender XDR']).toContain(control.dataSource.type);
+        expect(['Azure Resource Graph', 'Log Analytics', 'Microsoft Defender XDR', 'Microsoft Sentinel Data Lake']).toContain(control.dataSource.type);
         expect(control.dataSource.table).toBeTruthy();
         expect(control.dataSource.license).toBeTruthy();
         expect(control.dataSource.setup.length).toBeGreaterThanOrEqual(1);
