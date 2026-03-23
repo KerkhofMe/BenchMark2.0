@@ -23,7 +23,7 @@
       "title": "Protect identity and authentication systems",
       "description": "Monitor suspicious sign-ins, enforce MFA, restrict legacy auth protocols.",
       "status": "non-compliant",
-      "kqlQuery": "SigninLogs\n| where TimeGenerated > ago(7d)\n| where ResultType != \"0\"\n| where ClientAppUsed in (\"Exchange ActiveSync\",\"IMAP4\",\"POP3\",\"SMTP\")\n| summarize FailedLegacyAuth = count() by UserPrincipalName, ClientAppUsed\n| order by FailedLegacyAuth desc",
+      "kqlQuery": "SigninLogs\n| where TimeGenerated > ago(7d)\n| where ResultType != \"0\"\n| where ClientAppUsed in (\"Exchange ActiveSync\",\"IMAP4\",\"POP3\",\"SMTP\")\n| summarize FailedLegacyAuth = count() by UserPrincipalName, ClientAppUsed\n| order by FailedLegacyAuth desc\n| take 100",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/9b828565-a0ed-4f21-bc1b-da5c90ad0023.html",
       "remediation": "Create a Conditional Access policy to block legacy authentication. In Entra ID > Security > Conditional Access, create a policy targeting all users with client apps set to Exchange ActiveSync and Other clients, then set grant to Block access.",
       "dataSource": {
@@ -41,7 +41,7 @@
       "title": "Manage application identities securely",
       "description": "Use managed identities instead of service principals with secrets.",
       "status": "compliant",
-      "kqlQuery": "AuditLogs\n| where TimeGenerated > ago(7d)\n| where OperationName has \"Add service principal credentials\"\n| extend AppName = tostring(TargetResources[0].displayName)\n| project TimeGenerated, AppName\n| order by TimeGenerated desc\n| take 50",
+      "kqlQuery": "AuditLogs\n| where TimeGenerated > ago(7d)\n| where OperationName has \"Add service principal credentials\"\n| extend AppName = tostring(TargetResources[0].displayName)\n| extend InitiatedBy = tostring(InitiatedBy.user.userPrincipalName)\n| project TimeGenerated, AppName, InitiatedBy\n| order by TimeGenerated desc\n| take 50",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/71ef260a-8f18-47b7-abcb-62d0673d94dc.html",
       "remediation": "Migrate service principals using client secrets to managed identities. For each app run: az webapp identity assign --name <app> --resource-group <rg>",
       "dataSource": {
@@ -59,7 +59,7 @@
       "title": "Use strong authentication controls",
       "description": "Enforce MFA for all users and use passwordless methods where possible.",
       "status": "non-compliant",
-      "kqlQuery": "SigninLogs\n| where TimeGenerated > ago(7d)\n| where AuthenticationRequirement == \"singleFactorAuthentication\"\n| summarize SingleFactorCount = count() by UserPrincipalName, AppDisplayName\n| order by SingleFactorCount desc\n| take 100",
+      "kqlQuery": "SigninLogs\n| where TimeGenerated > ago(7d)\n| where ResultType == \"0\"\n| where AuthenticationRequirement == \"singleFactorAuthentication\"\n| summarize SingleFactorCount = count() by UserPrincipalName, AppDisplayName\n| order by SingleFactorCount desc\n| take 100",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/e3e008c3-56b9-4133-8fd7-d3347377402a.html",
       "remediation": "Enable MFA via Conditional Access for all users. In Entra ID > Security > Conditional Access, create policy for all users and all cloud apps with grant set to Require multifactor authentication.",
       "dataSource": {
@@ -79,7 +79,7 @@
       "title": "Establish network segmentation boundaries",
       "description": "Segment virtual networks with NSGs and subnets to isolate workloads.",
       "status": "compliant",
-      "kqlQuery": "AzureNetworkAnalytics_CL\n| where TimeGenerated > ago(7d)\n| where SubType_s == \"FlowLog\"\n| summarize AllowedFlows = count() by NSGRule_s, DestPort_d\n| order by AllowedFlows desc\n| take 50",
+      "kqlQuery": "AzureNetworkAnalytics_CL\n| where TimeGenerated > ago(7d)\n| where SubType_s == \"FlowLog\"\n| summarize AllowedFlows = count() by NSGRule_s, DestPort_d, FlowDirection_s\n| order by AllowedFlows desc\n| take 50",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/e71308d3-144b-4262-b144-efdc3cc90517.html",
       "remediation": "Review NSG rules and ensure proper subnet segmentation. Use az network nsg rule list to audit. Deny all inbound by default, allow only required ports.",
       "dataSource": {
@@ -99,7 +99,7 @@
       "title": "Secure cloud native services with network controls",
       "description": "Use private endpoints to restrict public network exposure.",
       "status": "non-compliant",
-      "kqlQuery": "arg(\"\").resources\n| where type =~ \"Microsoft.Network/privateEndpoints\"\n| extend connectionState = properties.privateLinkServiceConnections[0].properties.privateLinkServiceConnectionState.status\n| where connectionState != \"Approved\"\n| project name, resourceGroup, connectionState",
+      "kqlQuery": "arg(\"\").resources\n| where type =~ \"Microsoft.Network/privateEndpoints\"\n| extend connectionState = tostring(properties.privateLinkServiceConnections[0].properties.privateLinkServiceConnectionState.status)\n| where connectionState != \"Approved\"\n| project name, resourceGroup, connectionState",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/b52e1c26-1518-455b-8843-1e697137dc7d.html",
       "remediation": "Create private endpoints for all PaaS services. Run: az network private-endpoint create with the appropriate vnet, subnet, and resource ID parameters.",
       "dataSource": {
@@ -134,7 +134,7 @@
       "title": "Deploy intrusion detection/prevention systems",
       "description": "Use Azure Firewall Premium IDPS for threat signature inspection.",
       "status": "manual",
-      "kqlQuery": "AzureDiagnostics\n| where TimeGenerated > ago(7d)\n| where Category == \"AzureFirewallIDPSSignature\"\n| summarize AlertCount = count() by bin(TimeGenerated, 1h)\n| order by TimeGenerated desc",
+      "kqlQuery": "AzureDiagnostics\n| where TimeGenerated > ago(7d)\n| where Category == \"AzureFirewallIDPSSignature\"\n| extend SignatureId = tostring(column_ifexists(\"SignatureId_s\", \"\"))\n| extend Description = tostring(column_ifexists(\"Description_s\", \"\"))\n| summarize AlertCount = count() by bin(TimeGenerated, 1h), SignatureId, Description\n| order by TimeGenerated desc\n| take 168",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/564feb30-bf6a-4854-b4bb-0d2d2d1e6c66.html",
       "remediation": "Manually verify Azure Firewall Premium IDPS is enabled. In Portal > Azure Firewall > IDPS tab, confirm signature-based detection is set to Alert and Deny.",
       "dataSource": {
@@ -193,7 +193,7 @@
       "title": "Monitor anomalies and threats to sensitive data",
       "description": "Enable advanced threat protection on data services.",
       "status": "non-compliant",
-      "kqlQuery": "SecurityAlert\n| where TimeGenerated > ago(7d)\n| where ProviderName == \"Azure Security Center\"\n| where AlertType has_any (\"SQL\",\"Storage\",\"CosmosDB\")\n| project TimeGenerated, AlertName, AlertSeverity\n| order by TimeGenerated desc\n| take 50",
+      "kqlQuery": "SecurityAlert\n| where TimeGenerated > ago(7d)\n| where ProviderName == \"Azure Security Center\"\n| where AlertType has_any (\"SQL\",\"Storage\",\"CosmosDB\")\n| project TimeGenerated, AlertName, AlertSeverity, ResourceId\n| order by TimeGenerated desc\n| take 50",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/4da35fc9-c9e7-4960-aec9-797fe7d9051d.html",
       "remediation": "Enable Microsoft Defender for SQL, Storage, and Cosmos DB. Run: az security pricing create --name SqlServers --tier Standard",
       "dataSource": {
@@ -211,7 +211,7 @@
       "title": "Encrypt sensitive data in transit",
       "description": "Enforce TLS 1.2+ for all data in transit and HTTPS-only access.",
       "status": "compliant",
-      "kqlQuery": "arg(\"\").resources\n| where type =~ \"Microsoft.Web/sites\"\n| extend minTlsVersion = tostring(properties.siteConfig.minTlsVersion)\n| where minTlsVersion != \"1.2\" and minTlsVersion != \"1.3\"\n| project name, resourceGroup, minTlsVersion",
+      "kqlQuery": "arg(\"\").resources\n| where type =~ \"Microsoft.Web/sites\"\n| extend minTlsVersion = tostring(properties.siteConfig.minTlsVersion)\n| extend httpsOnly = tobool(properties.httpsOnly)\n| where minTlsVersion != \"1.2\" and minTlsVersion != \"1.3\" or httpsOnly == false\n| project name, resourceGroup, minTlsVersion, httpsOnly",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/f0e6e85b-9b9f-4a4b-b67b-f730d42f1b0b.html",
       "remediation": "Enforce minimum TLS 1.2. For App Service: az webapp config set --min-tls-version 1.2. For Storage: az storage account update --min-tls-version TLS1_2",
       "dataSource": {
@@ -228,7 +228,7 @@
       "title": "Enable data at rest encryption by default",
       "description": "Ensure all data stores use encryption at rest with managed keys.",
       "status": "compliant",
-      "kqlQuery": "arg(\"\").resources\n| where type in~ (\"Microsoft.Storage/storageAccounts\",\"Microsoft.Sql/servers/databases\")\n| extend encryption = tostring(properties.encryption.services.blob.enabled)\n| where encryption != \"true\"\n| project name, type, resourceGroup",
+      "kqlQuery": "arg(\"\").resources\n| where type =~ \"Microsoft.Storage/storageAccounts\"\n| extend encryption = tostring(properties.encryption.services.blob.enabled)\n| where encryption != \"true\"\n| project name, type, resourceGroup, subscriptionId\n| union (\n    arg(\"\").resources\n    | where type =~ \"Microsoft.Sql/servers/databases\"\n    | extend tde = tostring(properties.transparentDataEncryption.status)\n    | where tde !~ \"Enabled\"\n    | project name, type, resourceGroup, subscriptionId\n)\n| order by type asc",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/0961003e-5a0a-4549-abde-af6a37f2724d.html",
       "remediation": "Verify encryption at rest is enabled. For Storage accounts: az storage account show --query encryption. All Azure PaaS services enable encryption at rest by default.",
       "dataSource": {
@@ -283,7 +283,7 @@
       "title": "Ensure security of asset lifecycle management",
       "description": "Apply security configs at creation and decommission unused resources.",
       "status": "manual",
-      "kqlQuery": "arg(\"\").resources\n| extend age = datetime_diff(\"day\", now(), todatetime(properties.creationTime))\n| where age > 365\n| project name, type, resourceGroup, age\n| order by age desc\n| take 50",
+      "kqlQuery": "arg(\"\").resources\n| where isnotempty(properties.creationTime)\n| extend age = datetime_diff(\"day\", now(), todatetime(properties.creationTime))\n| where age > 365\n| project name, type, resourceGroup, age\n| order by age desc\n| take 50",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/0a914e76-4921-4c19-b460-a2d36003525a.html",
       "remediation": "Review resources older than 365 days using the KQL query. Create a periodic review process and decommission unused resources. Tag resources with owner and expiry date.",
       "dataSource": {
@@ -451,7 +451,7 @@
       "title": "Audit and enforce secure configurations",
       "description": "Continuously audit configs and remediate non-compliant resources.",
       "status": "non-compliant",
-      "kqlQuery": "PolicyResources\n| where type == \"microsoft.policyinsights/policystates\"\n| where properties.complianceState == \"NonCompliant\"\n| summarize Count = count() by tostring(properties.policyDefinitionName)\n| order by Count desc",
+      "kqlQuery": "PolicyResources\n| where type == \"microsoft.policyinsights/policystates\"\n| where properties.complianceState == \"NonCompliant\"\n| summarize Count = count() by tostring(properties.policyDefinitionName)\n| order by Count desc\n| take 100",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/06a78e20-9358-41c9-923c-fb736d382a4d.html",
       "remediation": "Review non-compliant policies in Defender for Cloud. Prioritize by severity and remediate using the built-in Remediate button for each recommendation.",
       "dataSource": {
@@ -468,7 +468,7 @@
       "title": "Perform regular vulnerability assessments",
       "description": "Run vulnerability assessments on compute, database, and container resources.",
       "status": "non-compliant",
-      "kqlQuery": "SecurityRecommendation\n| where TimeGenerated > ago(7d)\n| where RecommendationDisplayName has \"vulnerability\"\n| where RecommendationState == \"Active\"\n| project TimeGenerated, RecommendationDisplayName, RecommendationSeverity\n| take 50",
+      "kqlQuery": "SecurityRecommendation\n| where TimeGenerated > ago(7d)\n| where RecommendationDisplayName has \"vulnerability\"\n| where RecommendationState == \"Active\"\n| project TimeGenerated, RecommendationDisplayName, RecommendationSeverity\n| order by TimeGenerated desc\n| take 50",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/501541f7-f7e7-4cd6-868c-4190fdad3ac9.html",
       "remediation": "Enable vulnerability assessment on VMs and SQL databases. Enable the Qualys or Microsoft Defender vulnerability scanner via Defender for Cloud.",
       "dataSource": {
@@ -487,7 +487,7 @@
       "title": "Remediate vulnerabilities in a timely manner",
       "description": "Establish SLAs for vulnerability remediation by severity.",
       "status": "manual",
-      "kqlQuery": "SecurityRecommendation\n| where TimeGenerated > ago(30d)\n| where RecommendationState == \"Active\"\n| extend DaysOpen = datetime_diff(\"day\", now(), TimeGenerated)\n| summarize AvgDays = avg(DaysOpen) by RecommendationSeverity\n| order by AvgDays desc",
+      "kqlQuery": "SecurityRecommendation\n| where TimeGenerated > ago(30d)\n| where RecommendationState == \"Active\"\n| extend DaysOpen = datetime_diff(\"day\", now(), TimeGenerated)\n| summarize AvgDays = avg(DaysOpen) by RecommendationSeverity\n| order by AvgDays desc\n| take 20",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/3c735d8a-a4ba-4a3a-b7cf-db7754cf57f4.html",
       "remediation": "Define SLA targets: Critical = 7 days, High = 30 days, Medium = 90 days. Track remediation age using the KQL query and escalate overdue items.",
       "dataSource": {
@@ -508,7 +508,7 @@
       "title": "Use Endpoint Detection and Response",
       "description": "Deploy Microsoft Defender for Endpoint on all servers and workstations.",
       "status": "compliant",
-      "kqlQuery": "DeviceInfo\n| where Timestamp > ago(7d)\n| where OnboardingStatus == \"Onboarded\"\n| summarize DeviceCount = dcount(DeviceId) by OSPlatform\n| order by DeviceCount desc",
+      "kqlQuery": "DeviceInfo\n| where Timestamp > ago(7d)\n| where OnboardingStatus == \"Onboarded\"\n| summarize DeviceCount = dcount(DeviceId) by OSPlatform\n| order by DeviceCount desc\n| take 50",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/2465583e-4e78-4c15-b6be-a36cbc7c8b0f.html",
       "remediation": "Verify all endpoints are onboarded to Defender for Endpoint. Use the KQL query to check onboarding status by OS platform.",
       "dataSource": {
@@ -527,12 +527,12 @@
       "title": "Use modern anti-malware protection",
       "description": "Ensure Defender Antivirus is enabled with real-time protection.",
       "status": "compliant",
-      "kqlQuery": "DeviceTvmSoftwareVulnerabilities\n| where Timestamp > ago(7d)\n| where SoftwareName has \"defender\"\n| summarize VulnCount = count() by DeviceName, VulnerabilitySeverityLevel\n| order by VulnCount desc\n| take 50",
+      "kqlQuery": "DeviceTvmSecureConfigurationAssessment\n| where Timestamp > ago(7d)\n| where ConfigurationSubcategory == \"Antivirus\"\n| where ConfigurationId in (\"scid-2010\", \"scid-2011\", \"scid-2012\")\n| where IsCompliant == 0\n| summarize arg_max(Timestamp, *) by DeviceId\n| project DeviceName, ConfigurationId, IsCompliant, IsApplicable\n| order by DeviceName asc\n| take 50",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/2d7e144b-159c-44fc-95c1-ac3dbf5e6e54.html",
       "remediation": "Confirm Defender Antivirus real-time protection is enabled. Check via Intune compliance policies or PowerShell: Get-MpPreference.",
       "dataSource": {
         "type": "Microsoft Defender XDR",
-        "table": "DeviceTvmSoftwareVulnerabilities",
+        "table": "DeviceTvmSecureConfigurationAssessment",
         "license": "Microsoft Defender for Endpoint P2 (or M365 E5)",
         "setup": [
           "Onboard devices via Intune, GPO, or manual script",
@@ -681,7 +681,7 @@
       "title": "Align organization roles and responsibilities",
       "description": "Define clear security roles and assign ownership per subscription.",
       "status": "compliant",
-      "kqlQuery": "AuditLogs\n| where TimeGenerated > ago(7d)\n| where OperationName has \"Add member to role\"\n| extend RoleName = tostring(TargetResources[0].displayName)\n| project TimeGenerated, RoleName\n| order by TimeGenerated desc\n| take 50",
+      "kqlQuery": "AuditLogs\n| where TimeGenerated > ago(7d)\n| where OperationName has \"Add member to role\"\n| extend RoleName = tostring(TargetResources[0].displayName)\n| extend AddedUser = tostring(TargetResources[0].userPrincipalName)\n| extend InitiatedBy = tostring(InitiatedBy.user.userPrincipalName)\n| project TimeGenerated, RoleName, AddedUser, InitiatedBy\n| order by TimeGenerated desc\n| take 50",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/4f11b553-d42e-4e3a-89be-32ca364cad4c.html",
       "remediation": "Assign security owners per subscription using Azure RBAC. Document the RACI matrix for security responsibilities.",
       "dataSource": {
@@ -699,12 +699,12 @@
       "title": "Define enterprise segmentation strategy",
       "description": "Implement management group hierarchy for separation of duties.",
       "status": "compliant",
-      "kqlQuery": "arg(\"\").managementgroups\n| project ManagementGroupId = name, DisplayName = properties.displayName\n| order by ManagementGroupId asc",
+      "kqlQuery": "resourcecontainers\n| where type =~ \"microsoft.management/managementgroups\"\n| project ManagementGroupId = name, DisplayName = properties.displayName\n| order by ManagementGroupId asc",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/4f11b553-d42e-4e3a-89be-32ca364cad4c.html",
       "remediation": "Review management group hierarchy. Ensure separation between production, development, and sandbox environments.",
       "dataSource": {
         "type": "Azure Resource Graph",
-        "table": "arg(\"\").managementgroups",
+        "table": "resourcecontainers",
         "license": "None (always available)",
         "setup": [
           "No setup required — runs against any Azure subscription"
@@ -736,7 +736,7 @@
       "title": "Discover and inventory AI workloads",
       "description": "Inventory all AI/ML models and endpoints including Azure OpenAI.",
       "status": "manual",
-      "kqlQuery": "arg(\"\").resources\n| where type in~ (\"Microsoft.CognitiveServices/accounts\",\"Microsoft.MachineLearningServices/workspaces\")\n| project name, type, location, resourceGroup\n| order by type asc",
+      "kqlQuery": "arg(\"\").resources\n| where type in~ (\"Microsoft.CognitiveServices/accounts\",\"Microsoft.MachineLearningServices/workspaces\")\n| extend kind = tostring(properties.kind)\n| project name, type, kind, location, resourceGroup, subscriptionId\n| order by type asc",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/0a914e76-4921-4c19-b460-a2d36003525a.html",
       "remediation": "Run the Resource Graph query to inventory all Cognitive Services and ML workspaces. Tag each with owner, purpose, and data classification.",
       "dataSource": {
@@ -753,7 +753,7 @@
       "title": "Protect AI models and data pipelines",
       "description": "Secure AI training data with encryption, access controls, and network isolation.",
       "status": "non-compliant",
-      "kqlQuery": "AzureDiagnostics\n| where TimeGenerated > ago(7d)\n| where ResourceProvider == \"MICROSOFT.COGNITIVESERVICES\"\n| where ResultType != \"Success\"\n| summarize FailedCalls = count() by Resource, OperationName\n| where FailedCalls > 10\n| order by FailedCalls desc",
+      "kqlQuery": "AzureDiagnostics\n| where TimeGenerated > ago(7d)\n| where ResourceProvider == \"MICROSOFT.COGNITIVESERVICES\"\n| where ResultType != \"Success\"\n| summarize FailedCalls = count() by Resource, OperationName\n| where FailedCalls > 10\n| order by FailedCalls desc\n| take 50",
       "policyLink": "https://www.azadvertizer.net/azpolicyadvertizer/0725b4dd-7e76-479c-a735-68e7ee23d5de.html",
       "remediation": "Enable network isolation for Cognitive Services. Configure private endpoints and disable public network access for all AI service instances.",
       "dataSource": {

@@ -39,7 +39,7 @@ const dataSources = {
   'PV-4': { type: 'Log Analytics', table: 'SecurityRecommendation', license: 'Microsoft Defender for Cloud (Standard tier)', setup: ['Defender for Cloud \u2192 Environment settings \u2192 Continuous export', 'Export category: Security recommendations', 'Select target Log Analytics workspace'] },
 
   'ES-1': { type: 'Microsoft Defender XDR', table: 'DeviceInfo', license: 'Microsoft Defender for Endpoint P2 (or M365 E5)', setup: ['Onboard devices via Intune, GPO, or manual script', 'Query runs in security.microsoft.com \u2192 Advanced Hunting', 'To query in Log Analytics: connect Sentinel \u2192 M365 Defender data connector'] },
-  'ES-2': { type: 'Microsoft Defender XDR', table: 'DeviceTvmSoftwareVulnerabilities', license: 'Microsoft Defender for Endpoint P2 (or M365 E5)', setup: ['Onboard devices via Intune, GPO, or manual script', 'Threat & Vulnerability Management is included with MDE P2', 'Query runs in security.microsoft.com \u2192 Advanced Hunting'] },
+  'ES-2': { type: 'Microsoft Defender XDR', table: 'DeviceTvmSecureConfigurationAssessment', license: 'Microsoft Defender for Endpoint P2 (or M365 E5)', setup: ['Onboard devices via Intune, GPO, or manual script', 'Threat & Vulnerability Management is included with MDE P2', 'Query runs in security.microsoft.com → Advanced Hunting'] },
   'ES-3': { type: 'Microsoft Defender XDR', table: 'DeviceTvmSecureConfigurationAssessment', license: 'Microsoft Defender for Endpoint P2 (or M365 E5)', setup: ['Onboard devices via Intune, GPO, or manual script', 'Threat & Vulnerability Management is included with MDE P2', 'Query runs in security.microsoft.com \u2192 Advanced Hunting'] },
 
   'BR-1': { type: 'Log Analytics', table: 'AzureDiagnostics', license: 'None (included with Recovery Services vault)', setup: ['Recovery Services vault \u2192 Diagnostic settings \u2192 Send to Log Analytics workspace', 'Enable log category: AzureBackupReport'] },
@@ -51,7 +51,7 @@ const dataSources = {
   'DS-3': { type: 'Log Analytics', table: 'AzureDevOpsAuditing', license: 'Microsoft Sentinel + Azure DevOps', setup: ['Enable Microsoft Sentinel on Log Analytics workspace', 'Sentinel \u2192 Data connectors \u2192 Azure DevOps \u2192 Connect', 'Requires Azure DevOps Organization admin permissions'] },
 
   'GS-1': { type: 'Log Analytics', table: 'AuditLogs', license: 'Microsoft Entra ID P1/P2', setup: ['Entra ID \u2192 Diagnostic settings \u2192 Send to Log Analytics workspace', 'Enable log category: AuditLogs'] },
-  'GS-2': { type: 'Azure Resource Graph', table: 'arg("").managementgroups', license: 'None (always available)', setup: ['No setup required \u2014 runs against any Azure subscription'] },
+  'GS-2': { type: 'Azure Resource Graph', table: 'resourcecontainers', license: 'None (always available)', setup: ['No setup required — runs against any Azure subscription'] },
   'GS-3': { type: 'Log Analytics', table: 'InformationProtectionLogs_CL', license: 'Microsoft 365 E5 or Microsoft Purview Information Protection', setup: ['Purview compliance portal \u2192 Settings \u2192 Enable analytics', 'Configure Log Analytics workspace export'] },
 
   'AI-1': { type: 'Azure Resource Graph', table: 'arg("").resources', license: 'None (always available)', setup: ['No setup required \u2014 runs against any Azure subscription'] },

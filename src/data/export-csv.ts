@@ -4,6 +4,14 @@ interface ExportableControl extends Control {
   domainCode?: string;
 }
 
+/** Prevent CSV formula injection by escaping cells that start with dangerous characters. */
+function sanitizeCsvCell(cell: string): string {
+  if (/^[=+\-@\t\r]/.test(cell)) {
+    return "'" + cell;
+  }
+  return cell;
+}
+
 export function exportControlsCsv(controls: ExportableControl[], filename: string, notesMap: Record<string, string> = {}, evidenceMap: Record<string, EvidenceLink[]> = {}) {
   const headers = ['ID', 'Title', 'Description', 'Status', 'Assessment Note', 'Evidence Links', 'Remediation', 'KQL Query', 'Azure Policy Link', 'Data Source', 'Table', 'License', 'Setup Steps'];
   const rows = controls.map((c) => [
@@ -23,7 +31,7 @@ export function exportControlsCsv(controls: ExportableControl[], filename: strin
   ]);
 
   const csvContent = [headers, ...rows]
-    .map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(','))
+    .map((row) => row.map((cell) => `"${sanitizeCsvCell(cell).replace(/"/g, '""')}"`).join(','))
     .join('\n');
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
