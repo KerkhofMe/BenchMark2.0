@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import domains from '../data/mcsb-domains.json';
 import allControls from '../data/mcsb-controls.json';
 import { getComplianceScore, useStatusStore } from '../data/compute-scores';
+import { scoreDotColor } from '../utils/status';
 import type { Domain } from '../types/domain';
 import type { Control } from '../types/control';
 
@@ -11,6 +13,16 @@ const typedDomains: Domain[] = domains;
 
 export default function Sidebar() {
   const { statusMap } = useStatusStore();
+
+  const domainStats = useMemo(() =>
+    typedDomains.map((domain) => {
+      const ctrls = typedControls[domain.code] ?? [];
+      const assessed = ctrls.filter((c) => statusMap[c.id] && statusMap[c.id] !== 'unchecked').length;
+      const score = getComplianceScore(domain.code, statusMap);
+      return { domain, assessed, total: ctrls.length, score };
+    }),
+    [statusMap],
+  );
 
   return (
     <aside className="w-80 shrink-0 bg-slate-800 border-r border-slate-700 overflow-y-auto">
@@ -50,7 +62,7 @@ export default function Sidebar() {
             Search Controls
           </NavLink>
           <div className="border-t border-slate-700 my-2" />
-          {typedDomains.map((domain) => (
+          {domainStats.map(({ domain, assessed, total, score }) => (
             <NavLink
               key={domain.code}
               to={`/domain/${domain.code}`}
@@ -66,13 +78,10 @@ export default function Sidebar() {
               <span className="font-mono text-xs w-7 shrink-0">{domain.code}</span>
               <span className="truncate flex-1" title={domain.name}>{domain.name}</span>
               <span className="text-xs opacity-70 shrink-0 tabular-nums text-right">
-                {(() => {
-                  const ctrls = typedControls[domain.code] ?? [];
-                  const assessed = ctrls.filter((c) => statusMap[c.id] && statusMap[c.id] !== 'unchecked').length;
-                  return `${assessed}/${ctrls.length}`;
-                })()}
+                {assessed}/{total}
               </span>
-              <span className="text-xs opacity-70 shrink-0 tabular-nums w-8 text-right">{getComplianceScore(domain.code, statusMap)}%</span>
+              <span className={`w-2 h-2 rounded-full shrink-0 ${scoreDotColor(score)}`} />
+              <span className="text-xs opacity-70 shrink-0 tabular-nums w-8 text-right">{score}%</span>
             </NavLink>
           ))}
         </nav>

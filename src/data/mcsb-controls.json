@@ -19,7 +19,8 @@
           "Data is ingested into Analytics tier and mirrored to the Data Lake tier for long-term retention",
           "Configure retention: Defender portal → Settings → Data retention → set up to 12 years"
         ]
-      }
+      },
+      "severity": "critical"
     },
     {
       "id": "IM-2",
@@ -40,7 +41,8 @@
           "Data is ingested into Analytics tier and mirrored to the Data Lake tier for long-term retention",
           "Configure retention: Defender portal → Settings → Data retention → set up to 12 years"
         ]
-      }
+      },
+      "severity": "critical"
     },
     {
       "id": "IM-3",
@@ -61,7 +63,8 @@
           "Data is ingested into Analytics tier and mirrored to the Data Lake tier for long-term retention",
           "Configure retention: Defender portal → Settings → Data retention → set up to 12 years"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "IM-4",
@@ -82,7 +85,8 @@
           "Data is ingested into Analytics tier and mirrored to the Data Lake tier for long-term retention",
           "Configure retention: Defender portal → Settings → Data retention → set up to 12 years"
         ]
-      }
+      },
+      "severity": "critical"
     }
   ],
   "NS": [
@@ -106,7 +110,8 @@
           "Data flows into Analytics tier and is mirrored to the Data Lake tier",
           "Use Data Lake for long-term network forensics up to 12 years"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "NS-2",
@@ -123,7 +128,8 @@
         "setup": [
           "No setup required — runs against any Azure subscription"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "NS-3",
@@ -143,7 +149,8 @@
           "Enable log category: AzureFirewallNetworkRule",
           "Data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "NS-4",
@@ -164,7 +171,8 @@
           "IDPS must be enabled on the Firewall Policy",
           "Data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "NS-5",
@@ -185,7 +193,8 @@
           "DDoS Protection plan must be associated with the VNet",
           "Data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "medium"
     }
   ],
   "DP": [
@@ -208,7 +217,8 @@
           "Custom log table (_CL suffix) — data flows into Analytics tier and is mirrored to the Data Lake tier",
           "Use Data Lake for long-term data classification audit trail"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "DP-2",
@@ -228,7 +238,8 @@
           "Defender for Cloud → Continuous export → Sentinel workspace",
           "Alerts flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "critical"
     },
     {
       "id": "DP-3",
@@ -245,7 +256,8 @@
         "setup": [
           "No setup required — runs against any Azure subscription"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "DP-4",
@@ -262,7 +274,8 @@
         "setup": [
           "No setup required — runs against any Azure subscription"
         ]
-      }
+      },
+      "severity": "medium"
     }
   ],
   "AM": [
@@ -281,7 +294,8 @@
         "setup": [
           "No setup required — runs against any Azure subscription"
         ]
-      }
+      },
+      "severity": "medium"
     },
     {
       "id": "AM-2",
@@ -302,7 +316,8 @@
           "Activity logs flow into Analytics tier and are mirrored to the Data Lake tier",
           "Use Data Lake for long-term activity audit trail up to 12 years"
         ]
-      }
+      },
+      "severity": "medium"
     },
     {
       "id": "AM-3",
@@ -319,7 +334,8 @@
         "setup": [
           "No setup required — runs against any Azure subscription"
         ]
-      }
+      },
+      "severity": "medium"
     }
   ],
   "LT": [
@@ -341,7 +357,8 @@
           "Defender for Cloud → Continuous export → Sentinel workspace",
           "Alerts flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "critical"
     },
     {
       "id": "LT-2",
@@ -362,7 +379,8 @@
           "Entra ID Protection must be enabled",
           "Risk data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "LT-3",
@@ -379,7 +397,8 @@
         "setup": [
           "No setup required — runs against any Azure subscription"
         ]
-      }
+      },
+      "severity": "medium"
     },
     {
       "id": "LT-4",
@@ -400,7 +419,8 @@
           "Enable Traffic Analytics → point to Sentinel workspace",
           "Network logs flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "medium"
     }
   ],
   "IR": [
@@ -422,7 +442,8 @@
           "Incidents are stored in Analytics tier and mirrored to the Data Lake tier",
           "Use Data Lake for long-term incident history and forensic analysis up to 12 years"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "IR-2",
@@ -439,7 +460,8 @@
         "setup": [
           "No setup required — runs against any Azure subscription"
         ]
-      }
+      },
+      "severity": "medium"
     },
     {
       "id": "IR-3",
@@ -459,7 +481,8 @@
           "Defender for Cloud → Continuous export → Sentinel workspace",
           "Alerts flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "high"
     }
   ],
   "PV": [
@@ -481,7 +504,8 @@
           "Export category: Security recommendations",
           "Recommendations flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "PV-2",
@@ -498,7 +522,8 @@
         "setup": [
           "No setup required — Azure Policy is built-in"
         ]
-      }
+      },
+      "severity": "medium"
     },
     {
       "id": "PV-3",
@@ -518,7 +543,8 @@
           "Export category: Security recommendations",
           "Recommendations flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "PV-4",
@@ -538,7 +564,8 @@
           "Export category: Security recommendations",
           "Use Data Lake for long-term vulnerability trend analysis up to 12 years"
         ]
-      }
+      },
+      "severity": "medium"
     }
   ],
   "ES": [
@@ -561,7 +588,8 @@
           "MDE data flows into Analytics tier and is mirrored to the Data Lake tier",
           "Query via Sentinel Data Lake KQL editor or Advanced Hunting"
         ]
-      }
+      },
+      "severity": "critical"
     },
     {
       "id": "ES-2",
@@ -582,7 +610,8 @@
           "TVM data flows into Analytics tier and is mirrored to the Data Lake tier",
           "Query via Sentinel Data Lake KQL editor or Advanced Hunting"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "ES-3",
@@ -603,7 +632,8 @@
           "TVM data flows into Analytics tier and is mirrored to the Data Lake tier",
           "Query via Sentinel Data Lake KQL editor or Advanced Hunting"
         ]
-      }
+      },
+      "severity": "high"
     }
   ],
   "BR": [
@@ -625,7 +655,8 @@
           "Enable log category: AzureBackupReport",
           "Backup data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "BR-2",
@@ -642,7 +673,8 @@
         "setup": [
           "No setup required — runs against any Azure subscription"
         ]
-      }
+      },
+      "severity": "medium"
     },
     {
       "id": "BR-3",
@@ -663,7 +695,8 @@
           "Backup data flows into Analytics tier and is mirrored to the Data Lake tier",
           "Use Data Lake for long-term backup compliance history"
         ]
-      }
+      },
+      "severity": "medium"
     }
   ],
   "DS": [
@@ -685,7 +718,8 @@
           "Requires Azure DevOps Organization admin permissions",
           "DevOps audit logs flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "DS-2",
@@ -705,7 +739,8 @@
           "Requires Azure DevOps Organization admin permissions",
           "DevOps audit logs flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "DS-3",
@@ -725,7 +760,8 @@
           "Requires Azure DevOps Organization admin permissions",
           "DevOps audit logs flow into Analytics tier and are mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "medium"
     }
   ],
   "GS": [
@@ -748,7 +784,8 @@
           "Audit data flows into Analytics tier and is mirrored to the Data Lake tier",
           "Configure retention: Defender portal → Settings → Data retention → set up to 12 years"
         ]
-      }
+      },
+      "severity": "medium"
     },
     {
       "id": "GS-2",
@@ -765,7 +802,8 @@
         "setup": [
           "No setup required — runs against any Azure subscription"
         ]
-      }
+      },
+      "severity": "medium"
     },
     {
       "id": "GS-3",
@@ -785,7 +823,8 @@
           "Configure export to Sentinel workspace",
           "Custom log table (_CL suffix) — data flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "low"
     }
   ],
   "AI": [
@@ -804,7 +843,8 @@
         "setup": [
           "No setup required — runs against any Azure subscription"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "AI-2",
@@ -824,7 +864,8 @@
           "Enable all log categories (RequestResponse)",
           "AI telemetry flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "high"
     },
     {
       "id": "AI-3",
@@ -844,7 +885,8 @@
           "Enable all log categories (RequestResponse)",
           "AI telemetry flows into Analytics tier and is mirrored to the Data Lake tier"
         ]
-      }
+      },
+      "severity": "medium"
     }
   ]
 }

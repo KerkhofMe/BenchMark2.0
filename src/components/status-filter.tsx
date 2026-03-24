@@ -12,9 +12,10 @@ const statuses: { value: ControlStatus | 'all'; label: string }[] = [
 interface StatusFilterProps {
   active: ControlStatus | 'all';
   onChange: (status: ControlStatus | 'all') => void;
+  counts?: Partial<Record<ControlStatus | 'all', number>>;
 }
 
-export default function StatusFilter({ active, onChange }: StatusFilterProps) {
+export default function StatusFilter({ active, onChange, counts }: StatusFilterProps) {
   return (
     <div className="flex gap-2 flex-wrap">
       {statuses.map(({ value, label }) => (
@@ -27,7 +28,7 @@ export default function StatusFilter({ active, onChange }: StatusFilterProps) {
               : 'bg-slate-700 text-slate-400 hover:text-white hover:bg-slate-600'
           }`}
         >
-          {label}
+          {label}{counts && counts[value] != null ? ` (${counts[value]})` : ''}
         </button>
       ))}
     </div>

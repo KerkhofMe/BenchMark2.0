@@ -8,7 +8,6 @@ const mockDomain: Domain = {
   code: 'NS',
   name: 'Network Security',
   description: 'Controls covering network security fundamentals.',
-  complianceScore: 65,
 };
 
 describe('DomainCard', () => {

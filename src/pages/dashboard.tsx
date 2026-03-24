@@ -1,10 +1,13 @@
 import DomainCard from '../components/domain-card';
 import domains from '../data/mcsb-domains.json';
+import allControls from '../data/mcsb-controls.json';
 import { getComplianceScore, getAssessedCount, getAllControlsWithStatus, useStatusStore } from '../data/compute-scores';
 import { exportControlsCsv } from '../data/export-csv';
 import type { Domain } from '../types/domain';
+import type { Control } from '../types/control';
 
 const typedDomains: Domain[] = domains;
+const typedControls = allControls as Record<string, Control[]>;
 
 export default function Dashboard() {
   const { statusMap, notesMap, evidenceMap, resetAll } = useStatusStore();
@@ -31,7 +34,11 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-white">Security Overview</h1>
           <div className="flex gap-2">
             <button
-              onClick={resetAll}
+              onClick={() => {
+                if (window.confirm('Are you sure you want to reset all statuses, notes, and evidence links? This action cannot be undone.')) {
+                  resetAll();
+                }
+              }}
               className="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white transition-colors"
             >
               Reset All
@@ -93,11 +100,30 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {unchecked === totalControls && (
+        <div className="bg-slate-800 border border-blue-500/30 rounded-xl p-6 mb-8 text-center">
+          <h2 className="text-lg font-semibold text-white mb-2">Welcome to the MCSB v2 Assessment</h2>
+          <p className="text-slate-400 text-sm max-w-xl mx-auto">
+            No controls have been assessed yet. Start by selecting a domain from the sidebar and updating the status of each control.
+            Your progress is saved automatically in the browser.
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {typedDomains.map((domain) => {
           const { assessed, total } = getAssessedCount(domain.code, statusMap);
+          const ctrls = typedControls[domain.code] ?? [];
+          const statusBreakdown = {
+            compliant: ctrls.filter((c) => (statusMap[c.id] ?? 'unchecked') === 'compliant').length,
+            partial: ctrls.filter((c) => (statusMap[c.id] ?? 'unchecked') === 'partial').length,
+            nonCompliant: ctrls.filter((c) => (statusMap[c.id] ?? 'unchecked') === 'non-compliant').length,
+            manual: ctrls.filter((c) => (statusMap[c.id] ?? 'unchecked') === 'manual').length,
+            unchecked: ctrls.filter((c) => (statusMap[c.id] ?? 'unchecked') === 'unchecked').length,
+          };
           return (
-            <DomainCard key={domain.code} domain={domain} complianceScore={getComplianceScore(domain.code, statusMap)} assessed={assessed} total={total} />
+            <DomainCard key={domain.code} domain={domain} complianceScore={getComplianceScore(domain.code, statusMap)} assessed={assessed} total={total} statusBreakdown={statusBreakdown} />
           );
         })}
       </div>

@@ -3,9 +3,10 @@ import domains from '../data/mcsb-domains.json';
 import allControls from '../data/mcsb-controls.json';
 import { getComplianceScore } from '../data/compute-scores';
 import type { Domain } from '../types/domain';
-import type { ControlStatus } from '../types/control';
+import type { ControlStatus, Severity } from '../types/control';
 
 const validStatuses: ControlStatus[] = ['compliant', 'non-compliant', 'partial', 'manual', 'unchecked'];
+const validSeverities: Severity[] = ['critical', 'high', 'medium', 'low'];
 
 describe('Mock data: mcsb-domains.json', () => {
   it('contains exactly 12 domains', () => {
@@ -17,9 +18,6 @@ describe('Mock data: mcsb-domains.json', () => {
       expect(domain.code).toBeTruthy();
       expect(domain.name).toBeTruthy();
       expect(domain.description).toBeTruthy();
-      expect(typeof domain.complianceScore).toBe('number');
-      expect(domain.complianceScore).toBeGreaterThanOrEqual(0);
-      expect(domain.complianceScore).toBeLessThanOrEqual(100);
     }
   });
 
@@ -38,7 +36,7 @@ describe('Mock data: mcsb-domains.json', () => {
 });
 
 describe('Mock data: mcsb-controls.json', () => {
-  const controlMap = allControls as Record<string, { id: string; title: string; description: string; status: string; kqlQuery: string; policyLink: string; remediation: string; dataSource: { type: string; table: string; license: string; setup: string[] } }[]>;
+  const controlMap = allControls as Record<string, { id: string; title: string; description: string; status: string; severity: string; kqlQuery: string; policyLink: string; remediation: string; dataSource: { type: string; table: string; license: string; setup: string[] } }[]>;
 
   it('has controls for all 12 domains', () => {
     const domainCodes = (domains as Domain[]).map((d) => d.code);
@@ -55,6 +53,7 @@ describe('Mock data: mcsb-controls.json', () => {
         expect(control.title).toBeTruthy();
         expect(control.description).toBeTruthy();
         expect(validStatuses).toContain(control.status);
+        expect(validSeverities).toContain(control.severity);
         expect(control.kqlQuery).toBeTruthy();
         expect(control.policyLink).toMatch(/^https:\/\//);
         expect(control.remediation).toBeTruthy();
@@ -96,7 +95,8 @@ describe('Computed compliance scores', () => {
     for (const domain of domains as Domain[]) {
       const controls = controlMap[domain.code];
       const compliant = controls.filter((c) => c.status === 'compliant').length;
-      const expected = Math.round((compliant / controls.length) * 100);
+      const partial = controls.filter((c) => c.status === 'partial').length;
+      const expected = Math.round(((compliant + partial * 0.5) / controls.length) * 100);
       expect(getComplianceScore(domain.code, statusMap)).toBe(expected);
     }
   });

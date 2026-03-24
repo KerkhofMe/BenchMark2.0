@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useDeferredValue } from 'react';
 import { Link } from 'react-router-dom';
 import ControlCard from '../components/control-card';
 import StatusFilter from '../components/status-filter';
@@ -12,6 +12,7 @@ const domainNameMap = Object.fromEntries(typedDomains.map((d) => [d.code, d.name
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
+  const deferredQuery = useDeferredValue(query);
   const [statusFilter, setStatusFilter] = useState<ControlStatus | 'all'>('all');
   const { statusMap } = useStatusStore();
 
@@ -20,10 +21,10 @@ export default function SearchPage() {
     domainName: domainNameMap[c.domainCode] ?? c.domainCode,
   }));
 
-  const lowerQuery = query.toLowerCase();
+  const lowerQuery = deferredQuery.toLowerCase();
   const results = allControlsFlat.filter((c) => {
     const matchesQuery =
-      !query ||
+      !deferredQuery ||
       c.id.toLowerCase().includes(lowerQuery) ||
       c.title.toLowerCase().includes(lowerQuery) ||
       c.description.toLowerCase().includes(lowerQuery) ||
@@ -31,6 +32,15 @@ export default function SearchPage() {
     const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
     return matchesQuery && matchesStatus;
   });
+
+  const filterCounts: Partial<Record<ControlStatus | 'all', number>> = {
+    all: allControlsFlat.length,
+    compliant: allControlsFlat.filter((c) => c.status === 'compliant').length,
+    partial: allControlsFlat.filter((c) => c.status === 'partial').length,
+    'non-compliant': allControlsFlat.filter((c) => c.status === 'non-compliant').length,
+    manual: allControlsFlat.filter((c) => c.status === 'manual').length,
+    unchecked: allControlsFlat.filter((c) => c.status === 'unchecked').length,
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -52,7 +62,7 @@ export default function SearchPage() {
               className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
           </div>
-          <StatusFilter active={statusFilter} onChange={setStatusFilter} />
+          <StatusFilter active={statusFilter} onChange={setStatusFilter} counts={filterCounts} />
         </div>
       </div>
 

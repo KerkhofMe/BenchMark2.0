@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, createElement, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import allControls from './mcsb-controls.json';
 import type { Control, ControlStatus, EvidenceLink } from '../types/control';
 
@@ -139,7 +139,11 @@ export function StatusProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(EVIDENCE_KEY);
   }, []);
 
-  return createElement(StatusContext.Provider, { value: { getStatus, setStatus, getNote, setNote, getEvidence, addEvidence, removeEvidence, resetAll, statusMap, notesMap, evidenceMap } }, children);
+  return (
+    <StatusContext value={{ getStatus, setStatus, getNote, setNote, getEvidence, addEvidence, removeEvidence, resetAll, statusMap, notesMap, evidenceMap }}>
+      {children}
+    </StatusContext>
+  );
 }
 
 export function useStatusStore(): StatusStore {

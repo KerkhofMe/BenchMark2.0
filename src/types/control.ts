@@ -1,5 +1,7 @@
 export type ControlStatus = 'compliant' | 'non-compliant' | 'partial' | 'manual' | 'unchecked';
 
+export type Severity = 'critical' | 'high' | 'medium' | 'low';
+
 export interface EvidenceLink {
   url: string;
   label: string;
@@ -19,6 +21,7 @@ export interface Control {
   title: string;
   description: string;
   status: ControlStatus;
+  severity: Severity;
   kqlQuery: string;
   policyLink: string;
   remediation: string;

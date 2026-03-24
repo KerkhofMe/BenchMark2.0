@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
-import type { ControlStatus, EvidenceLink } from '../types/control';
+import { memo, useState, useRef, useEffect } from 'react';
+import type { Control, ControlStatus } from '../types/control';
 import { useStatusStore } from '../data/compute-scores';
+import { statusColor, statusLabel, severityColor } from '../utils/status';
 
 const STATUS_OPTIONS: { value: ControlStatus; label: string }[] = [
   { value: 'compliant', label: 'Compliant' },
@@ -10,47 +11,11 @@ const STATUS_OPTIONS: { value: ControlStatus; label: string }[] = [
   { value: 'unchecked', label: 'Unchecked' },
 ];
 
-function statusColor(status: ControlStatus): string {
-  switch (status) {
-    case 'compliant': return 'text-green-400 bg-green-500/20';
-    case 'partial': return 'text-orange-400 bg-orange-500/20';
-    case 'non-compliant': return 'text-red-400 bg-red-500/20';
-    case 'manual': return 'text-yellow-400 bg-yellow-500/20';
-    case 'unchecked': return 'text-slate-400 bg-slate-500/20';
-  }
-}
-
-function statusLabel(status: ControlStatus): string {
-  switch (status) {
-    case 'compliant': return 'Compliant';
-    case 'partial': return 'Partial';
-    case 'non-compliant': return 'Non-Compliant';
-    case 'manual': return 'Manual';
-    case 'unchecked': return 'Unchecked';
-  }
-}
-
-interface DataSource {
-  type: string;
-  table: string;
-  license: string;
-  setup: string[];
-}
-
 interface ControlCardProps {
-  control: {
-    id: string;
-    title: string;
-    description: string;
-    status: ControlStatus;
-    kqlQuery: string;
-    policyLink: string;
-    remediation: string;
-    dataSource: DataSource;
-  };
+  control: Control;
 }
 
-export default function ControlCard({ control }: ControlCardProps) {
+export default memo(function ControlCard({ control }: ControlCardProps) {
   const [copied, setCopied] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const [showEvidenceForm, setShowEvidenceForm] = useState(false);
@@ -62,6 +27,26 @@ export default function ControlCard({ control }: ControlCardProps) {
   const [localNote, setLocalNote] = useState(note);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const noteRef = useRef<HTMLTextAreaElement>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  // Close picker on click outside or Escape
+  useEffect(() => {
+    if (!showPicker) return;
+    function handleClick(e: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setShowPicker(false);
+      }
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setShowPicker(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [showPicker]);
 
   useEffect(() => {
     setLocalNote(note);
@@ -111,6 +96,9 @@ export default function ControlCard({ control }: ControlCardProps) {
           <span className="text-xs font-mono font-semibold text-slate-400 bg-slate-700 px-2 py-1 rounded shrink-0">
             {control.id}
           </span>
+          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border uppercase tracking-wider ${severityColor(control.severity)}`}>
+            {control.severity}
+          </span>
           <h3 className="text-white font-semibold">{control.title}</h3>
           {note && (
             <svg className="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Has assessment note">
@@ -123,18 +111,22 @@ export default function ControlCard({ control }: ControlCardProps) {
             </svg>
           )}
         </div>
-        <div className="relative">
+        <div className="relative" ref={pickerRef}>
           <button
             onClick={() => setShowPicker(!showPicker)}
+            aria-expanded={showPicker}
+            aria-haspopup="listbox"
             className={`text-xs font-medium px-2.5 py-1 rounded-full shrink-0 cursor-pointer ${statusColor(control.status)}`}
           >
             {statusLabel(control.status)} ▾
           </button>
           {showPicker && (
-            <div className="absolute right-0 top-8 z-10 bg-slate-700 border border-slate-600 rounded-lg shadow-lg py-1 min-w-[140px]">
+            <div role="listbox" aria-label="Select status" className="absolute right-0 top-8 z-10 bg-slate-700 border border-slate-600 rounded-lg shadow-lg py-1 min-w-[140px]">
               {STATUS_OPTIONS.map(({ value, label }) => (
                 <button
                   key={value}
+                  role="option"
+                  aria-selected={control.status === value}
                   onClick={() => handleStatusChange(value)}
                   className={`block w-full text-left px-3 py-1.5 text-sm transition-colors ${
                     control.status === value
@@ -316,4 +308,4 @@ export default function ControlCard({ control }: ControlCardProps) {
       </div>
     </div>
   );
-}
+});

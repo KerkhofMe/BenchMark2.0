@@ -13,12 +13,13 @@ function sanitizeCsvCell(cell: string): string {
 }
 
 export function exportControlsCsv(controls: ExportableControl[], filename: string, notesMap: Record<string, string> = {}, evidenceMap: Record<string, EvidenceLink[]> = {}) {
-  const headers = ['ID', 'Title', 'Description', 'Status', 'Assessment Note', 'Evidence Links', 'Remediation', 'KQL Query', 'Azure Policy Link', 'Data Source', 'Table', 'License', 'Setup Steps'];
+  const headers = ['ID', 'Title', 'Description', 'Status', 'Severity', 'Assessment Note', 'Evidence Links', 'Remediation', 'KQL Query', 'Azure Policy Link', 'Data Source', 'Table', 'License', 'Setup Steps'];
   const rows = controls.map((c) => [
     c.id,
     c.title,
     c.description,
     c.status,
+    c.severity,
     notesMap[c.id] ?? '',
     (evidenceMap[c.id] ?? []).map((e) => `${e.label}: ${e.url}`).join(' | '),
     c.remediation,
@@ -40,5 +41,5 @@ export function exportControlsCsv(controls: ExportableControl[], filename: strin
   link.href = url;
   link.download = filename;
   link.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 }
