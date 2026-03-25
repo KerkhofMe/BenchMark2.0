@@ -1,7 +1,7 @@
 import DomainCard from '../components/domain-card';
 import domains from '../data/mcsb-domains.json';
 import allControls from '../data/mcsb-controls.json';
-import { getComplianceScore, getAssessedCount, getAllControlsWithStatus, useStatusStore } from '../data/compute-scores';
+import { getComplianceScore, getAssessedCount, getAllControlsWithStatus, useStatusStore, SENTINEL_SETUP_STEP } from '../data/compute-scores';
 import { exportControlsCsv } from '../data/export-csv';
 import type { Domain } from '../types/domain';
 import type { Control } from '../types/control';
@@ -10,7 +10,7 @@ const typedDomains: Domain[] = domains;
 const typedControls = allControls as Record<string, Control[]>;
 
 export default function Dashboard() {
-  const { statusMap, notesMap, evidenceMap, resetAll } = useStatusStore();
+  const { statusMap, notesMap, evidenceMap, resetAll, prerequisites, setPrerequisite } = useStatusStore();
   const allControlsFlat = getAllControlsWithStatus(statusMap);
 
   const scores = typedDomains.map((d) => getComplianceScore(d.code, statusMap));
@@ -99,6 +99,29 @@ export default function Dashboard() {
             <p className="text-xs text-slate-500 uppercase tracking-wider">Unchecked</p>
           </div>
         </div>
+      </div>
+
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 mb-8">
+        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Prerequisites</h2>
+        <label className="flex items-start gap-3 cursor-pointer group">
+          <input
+            type="checkbox"
+            checked={!!prerequisites.sentinelEnabled}
+            onChange={(e) => setPrerequisite('sentinelEnabled', e.target.checked)}
+            className="mt-0.5 w-4 h-4 rounded border-slate-600 bg-slate-700 text-teal-500 focus:ring-teal-500 focus:ring-offset-0 cursor-pointer"
+          />
+          <div>
+            <span className="text-sm text-white font-medium group-hover:text-teal-300 transition-colors">
+              {SENTINEL_SETUP_STEP}
+            </span>
+            <p className="text-xs text-slate-500 mt-0.5">
+              33 controls require Sentinel. Enable to hide this shared setup step from individual control cards.
+            </p>
+          </div>
+          <span className={`ml-auto text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${prerequisites.sentinelEnabled ? 'bg-teal-500/20 text-teal-400' : 'bg-slate-700 text-slate-500'}`}>
+            {prerequisites.sentinelEnabled ? 'Enabled' : 'Not set'}
+          </span>
+        </label>
       </div>
 
       {unchecked === totalControls && (

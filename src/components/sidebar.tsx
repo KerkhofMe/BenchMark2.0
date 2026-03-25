@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import domains from '../data/mcsb-domains.json';
 import allControls from '../data/mcsb-controls.json';
-import { getComplianceScore, useStatusStore } from '../data/compute-scores';
+import { getComplianceScore, useStatusStore, SENTINEL_SETUP_STEP } from '../data/compute-scores';
 import { scoreDotColor } from '../utils/status';
 import type { Domain } from '../types/domain';
 import type { Control } from '../types/control';
@@ -12,7 +12,7 @@ const typedControls = allControls as Record<string, Control[]>;
 const typedDomains: Domain[] = domains;
 
 export default function Sidebar() {
-  const { statusMap } = useStatusStore();
+  const { statusMap, prerequisites } = useStatusStore();
 
   const domainStats = useMemo(() =>
     typedDomains.map((domain) => {
@@ -30,6 +30,12 @@ export default function Sidebar() {
         <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
           Security Domains
         </h2>
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <span className={`w-2 h-2 rounded-full shrink-0 ${prerequisites.sentinelEnabled ? 'bg-teal-400' : 'bg-slate-600'}`} />
+          <span className={`text-xs ${prerequisites.sentinelEnabled ? 'text-teal-400' : 'text-slate-600'}`}>
+            Sentinel {prerequisites.sentinelEnabled ? '✓' : '✗'}
+          </span>
+        </div>
         <nav className="flex flex-col gap-1">
           <NavLink
             to="/overview"

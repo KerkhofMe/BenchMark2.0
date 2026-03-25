@@ -221,3 +221,59 @@ File: `src/data/compute-scores.ts` (line 142)
 
 **8. No CI/CD pipeline or lint configuration file visible**
 No `.github/workflows` directory, no `eslint.config.js` (ESLint 9 flat config expected), and no Husky/lint-staged configuration. The `package.json` lists ESLint scripts but without a visible config file, enforcement in CI is unclear.
+
+---
+
+### Planned Feature: Global Sentinel Prerequisite Toggle — RESOLVED
+
+#### Problem
+
+33 of 42 controls have `"Enable Microsoft Sentinel on a Log Analytics workspace"` as the first setup step in their Data Requirements section. This is a one-time tenant-level action, not a per-control task. Repeating it on every control card creates visual noise and makes the per-control setup steps harder to parse.
+
+#### Proposed Solution
+
+Extract the repeated Sentinel enablement step into a **global prerequisite toggle** on the Dashboard. When a user marks Sentinel as enabled, that step is hidden from all control cards' Data Requirements — making the remaining per-control steps more actionable. The JSON data stays untouched; filtering is purely a UI/presentation concern.
+
+#### ~~Implementation Plan~~
+
+**~~Phase 1: Data layer — add prerequisite state to `StatusProvider`~~**
+~~- Add a new localStorage key `mcsb-prerequisites` storing `Record<string, boolean>` (e.g., `{ sentinelEnabled: false }`). Load/save alongside existing maps in `src/data/compute-scores.tsx`.~~
+~~- Extend the `StatusStore` interface with `prerequisites: Record<string, boolean>` and `setPrerequisite(key: string, value: boolean): void`, exposed via context.~~
+~~- The `Record<string, boolean>` model is intentionally extensible — future prerequisites (e.g., "Defender for Cloud Standard tier enabled") fit without schema changes.~~
+~~- `resetAll()` also clears prerequisites, returning the app to a clean initial state.~~
+
+**~~Phase 2: UI — toggle on Dashboard + sidebar indicator~~**
+~~- Add a **"Prerequisites"** section on `src/pages/dashboard.tsx`, placed between the stat cards and the domain cards grid. Render as a compact card with a toggle/checkbox for *"Microsoft Sentinel enabled on a Log Analytics workspace"* and a note: *"33 controls require Sentinel — enable to hide the shared setup step from individual controls."*~~
+~~- Add a small "Sentinel: ✓ / ✗" badge in `src/components/sidebar.tsx` header so the state is visible from any page without navigating back to the Dashboard.~~
+
+**~~Phase 3: Filter setup steps in control cards~~**
+~~- In `src/components/control-card.tsx`, filter out any setup step matching `"Enable Microsoft Sentinel on a Log Analytics workspace"` when `prerequisites.sentinelEnabled` is `true`. Define the string as a shared constant to avoid magic strings.~~
+~~- If filtering removes all steps (i.e., the Sentinel step was the only one), show *"No additional setup required"* instead of an empty list.~~
+
+**~~Phase 4: Contextual hint when prerequisite is not enabled~~**
+~~- When a control has `dataSource.type === 'Microsoft Sentinel Data Lake'` and `prerequisites.sentinelEnabled` is `false`, show a small info nudge in the Data Requirements section: *"Requires Sentinel — enable in Dashboard prerequisites."*~~
+
+**Fix applied:** Implemented all four phases:
+- Added `prerequisites: Record<string, boolean>` state with `setPrerequisite()` to `StatusProvider`, persisted via localStorage key `mcsb-prerequisites`. `resetAll()` clears prerequisites. Exported `SENTINEL_SETUP_STEP` constant from `compute-scores.tsx`.
+- Added a "Prerequisites" section on the Dashboard between stat cards and domain grid with a labelled checkbox toggle showing enabled/not-set badge.
+- Added a "Sentinel ✓ / ✗" indicator in the sidebar header below "Security Domains".
+- Control cards now filter out the Sentinel enablement step when `sentinelEnabled` is true, showing "No additional setup required" if no steps remain. When Sentinel is required but not enabled, an amber info nudge reads "Requires Sentinel — enable in Dashboard prerequisites."
+
+#### Affected Files
+
+| File | Change |
+|------|--------|
+| `src/data/compute-scores.tsx` | Added `prerequisites` state, `setPrerequisite()`, `PREREQUISITES_KEY`, `SENTINEL_SETUP_STEP` constant, extended `StatusStore` interface, updated `resetAll()` and context value |
+| `src/pages/dashboard.tsx` | Added Prerequisites section with checkbox toggle between stat cards and domain grid |
+| `src/components/control-card.tsx` | Filters setup steps based on `prerequisites.sentinelEnabled`, shows "No additional setup required" fallback, shows amber hint when Sentinel required but not enabled |
+| `src/components/sidebar.tsx` | Added Sentinel ✓ / ✗ indicator badge in header |
+| `src/types/control.ts` | No changes — setup steps are plain strings, filtering is UI-side |
+| `src/data/mcsb-controls.json` | No changes — Sentinel step stays in JSON as the source of truth; filtering is runtime-only |
+
+#### Key Design Decisions
+
+1. **No JSON changes.** The setup step remains in `mcsb-controls.json` as the canonical source. If someone reads the raw JSON or exports CSV, they still see the full setup instructions. Filtering is a presentation concern only.
+2. **Exact string match.** Filter by the exact string `"Enable Microsoft Sentinel on a Log Analytics workspace"` — this text is consistent across all 33 controls. Defined as a constant to avoid magic strings.
+3. **Extensible model.** `Record<string, boolean>` rather than a single boolean, so future prerequisites can be added without schema changes.
+4. **Reset All scope.** `resetAll()` clears prerequisites too, consistent with its "return to clean state" behavior.
+5. **Dashboard placement over dedicated settings page.** The toggle lives on the Dashboard for now since no settings page exists. If more global settings accumulate, a dedicated `/settings` route may be warranted.

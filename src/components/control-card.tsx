@@ -1,6 +1,6 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import type { Control, ControlStatus } from '../types/control';
-import { useStatusStore } from '../data/compute-scores';
+import { useStatusStore, SENTINEL_SETUP_STEP } from '../data/compute-scores';
 import { statusColor, statusLabel, severityColor } from '../utils/status';
 
 const STATUS_OPTIONS: { value: ControlStatus; label: string }[] = [
@@ -21,7 +21,7 @@ export default memo(function ControlCard({ control }: ControlCardProps) {
   const [showEvidenceForm, setShowEvidenceForm] = useState(false);
   const [evidenceUrl, setEvidenceUrl] = useState('');
   const [evidenceLabel, setEvidenceLabel] = useState('');
-  const { setStatus, getNote, setNote, getEvidence, addEvidence, removeEvidence } = useStatusStore();
+  const { setStatus, getNote, setNote, getEvidence, addEvidence, removeEvidence, prerequisites } = useStatusStore();
   const note = getNote(control.id);
   const evidence = getEvidence(control.id);
   const [localNote, setLocalNote] = useState(note);
@@ -163,16 +163,34 @@ export default memo(function ControlCard({ control }: ControlCardProps) {
               <p className="text-sm text-slate-300">{control.dataSource.license}</p>
             </div>
           </div>
+          {!prerequisites.sentinelEnabled && control.dataSource.type === 'Microsoft Sentinel Data Lake' && (
+            <div className="flex items-center gap-2 mb-3 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
+              <svg className="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-xs text-amber-300">Requires Sentinel — enable in Dashboard prerequisites</span>
+            </div>
+          )}
           <div>
             <span className="text-xs text-slate-500 uppercase tracking-wider">Setup Steps</span>
-            <ul className="mt-1 space-y-1">
-              {control.dataSource.setup.map((step, i) => (
-                <li key={i} className="text-sm text-slate-400 flex gap-2">
-                  <span className="text-slate-600 shrink-0">{i + 1}.</span>
-                  {step}
-                </li>
-              ))}
-            </ul>
+            {(() => {
+              const filteredSteps = prerequisites.sentinelEnabled
+                ? control.dataSource.setup.filter((step) => step !== SENTINEL_SETUP_STEP)
+                : control.dataSource.setup;
+              if (filteredSteps.length === 0) {
+                return <p className="mt-1 text-sm text-slate-500 italic">No additional setup required</p>;
+              }
+              return (
+                <ul className="mt-1 space-y-1">
+                  {filteredSteps.map((step, i) => (
+                    <li key={i} className="text-sm text-slate-400 flex gap-2">
+                      <span className="text-slate-600 shrink-0">{i + 1}.</span>
+                      {step}
+                    </li>
+                  ))}
+                </ul>
+              );
+            })()}
           </div>
         </div>
       </details>

@@ -9,9 +9,13 @@ const typedControls = allControls as Record<string, Control[]>;
 const STORAGE_KEY = 'mcsb-control-statuses';
 const NOTES_KEY = 'mcsb-control-notes';
 const EVIDENCE_KEY = 'mcsb-evidence-links';
+const PREREQUISITES_KEY = 'mcsb-prerequisites';
 type StatusMap = Record<string, ControlStatus>;
 type NotesMap = Record<string, string>;
 type EvidenceMap = Record<string, EvidenceLink[]>;
+type PrerequisiteMap = Record<string, boolean>;
+
+export const SENTINEL_SETUP_STEP = 'Enable Microsoft Sentinel on a Log Analytics workspace';
 
 interface StatusStore {
   getStatus: (controlId: string) => ControlStatus;
@@ -25,6 +29,8 @@ interface StatusStore {
   statusMap: StatusMap;
   notesMap: NotesMap;
   evidenceMap: EvidenceMap;
+  prerequisites: PrerequisiteMap;
+  setPrerequisite: (key: string, value: boolean) => void;
 }
 
 const StatusContext = createContext<StatusStore | null>(null);
@@ -65,10 +71,31 @@ function saveEvidence(map: EvidenceMap) {
   localStorage.setItem(EVIDENCE_KEY, JSON.stringify(map));
 }
 
+function loadPrerequisites(): PrerequisiteMap {
+  try {
+    const raw = localStorage.getItem(PREREQUISITES_KEY);
+    if (raw) return JSON.parse(raw) as PrerequisiteMap;
+  } catch { /* ignore corrupted data */ }
+  return {};
+}
+
+function savePrerequisites(map: PrerequisiteMap) {
+  localStorage.setItem(PREREQUISITES_KEY, JSON.stringify(map));
+}
+
 export function StatusProvider({ children }: { children: ReactNode }) {
   const [statusMap, setStatusMap] = useState<StatusMap>(loadFromStorage);
   const [notesMap, setNotesMap] = useState<NotesMap>(loadNotes);
   const [evidenceMap, setEvidenceMap] = useState<EvidenceMap>(loadEvidence);
+  const [prerequisites, setPrerequisites] = useState<PrerequisiteMap>(loadPrerequisites);
+
+  const setPrerequisite = useCallback((key: string, value: boolean) => {
+    setPrerequisites((prev) => {
+      const next = { ...prev, [key]: value };
+      savePrerequisites(next);
+      return next;
+    });
+  }, []);
 
   const getStatus = useCallback(
     (controlId: string): ControlStatus => statusMap[controlId] ?? 'unchecked',
@@ -134,13 +161,15 @@ export function StatusProvider({ children }: { children: ReactNode }) {
     setStatusMap({});
     setNotesMap({});
     setEvidenceMap({});
+    setPrerequisites({});
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(NOTES_KEY);
     localStorage.removeItem(EVIDENCE_KEY);
+    localStorage.removeItem(PREREQUISITES_KEY);
   }, []);
 
   return (
-    <StatusContext value={{ getStatus, setStatus, getNote, setNote, getEvidence, addEvidence, removeEvidence, resetAll, statusMap, notesMap, evidenceMap }}>
+    <StatusContext value={{ getStatus, setStatus, getNote, setNote, getEvidence, addEvidence, removeEvidence, resetAll, statusMap, notesMap, evidenceMap, prerequisites, setPrerequisite }}>
       {children}
     </StatusContext>
   );
