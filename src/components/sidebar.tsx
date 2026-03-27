@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import domains from '../data/mcsb-domains.json';
 import allControls from '../data/mcsb-controls.json';
-import { getComplianceScore, useStatusStore, SENTINEL_SETUP_STEP } from '../data/compute-scores';
+import { getComplianceScore, useStatusStore } from '../data/compute-scores';
 import { scoreDotColor } from '../utils/status';
 import type { Domain } from '../types/domain';
 import type { Control } from '../types/control';
